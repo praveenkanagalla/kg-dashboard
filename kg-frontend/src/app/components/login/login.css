@@ -1,0 +1,79 @@
+/* Container form */
+.loginForm {
+    max-width: 400px;
+    margin: 60px auto;
+    padding: 30px;
+    background-color: #fefefe;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Heading */
+.form-heading {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 25px;
+    color: #682f12;
+}
+
+/* Label styling */
+.loginForm label {
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #682f12;
+}
+
+/* Input styling */
+.loginForm input {
+    padding: 10px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    transition: border-color 0.2s ease;
+}
+
+.loginForm input:focus {
+    border-color: #682f12;
+    outline: none;
+}
+
+/* Submit button */
+.loginForm button {
+    padding: 12px;
+    background-color: #682f12;
+    color: white;
+    border: none;
+    font-size: 16px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.loginForm button:hover {
+    background-color: #652e21;
+}
+
+/* Forgot password link */
+.loginForm a {
+    color: #682f12;
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.loginForm a:hover {
+    text-decoration: underline;
+}
+
+/* Error message */
+.error {
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: 500;
+    color: red;
+}
