@@ -1,0 +1,39 @@
+<form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="create-new-user">
+    <h2>Create New User</h2>
+
+    <label>Name</label>
+    <input formControlName="name" type="text" />
+
+    <label>Email</label>
+    <input formControlName="email" type="email" />
+
+    <label>Password</label>
+    <input formControlName="password" type="password" />
+
+    <label>Phone</label>
+    <input formControlName="phone" type="text" />
+
+    <label>Role</label>
+    <select formControlName="role">
+        <option *ngFor="let role of roles" [value]="role" aria-placeholder="select">{{ role }}</option>
+    </select>
+
+    <label>Access Permissions</label>
+    <div class="dropdown-checkbox">
+        <div class="dropdown-header" (click)="toggleDropdown()">
+            {{ selectedPermissionsLabel() }}
+            <span class="arrow">&#9662;</span>
+        </div>
+
+        <div class="dropdown-list" *ngIf="dropdownOpen">
+            <label *ngFor="let perm of permissionsList">
+                <input type="checkbox" [value]="perm.route"
+                    [checked]="userForm.get('permissions')?.value.includes(perm.route)"
+                    (change)="onAccessChange($event)" />
+                {{ perm.name }}
+            </label>
+        </div>
+    </div>
+
+    <button type="submit" [disabled]="userForm.invalid">Create User</button>
+</form>

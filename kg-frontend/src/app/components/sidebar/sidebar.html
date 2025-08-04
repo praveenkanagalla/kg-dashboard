@@ -1,0 +1,10 @@
+<nav class="sidebar">
+    <ul>
+        <li *ngFor="let comp of allComponents">
+            <a *ngIf="allowedComponents.includes(comp.route)" [routerLink]="['/', role + '-dashboard', comp.route]"
+                routerLinkActive="active-link">
+                {{ comp.name }}
+            </a>
+        </li>
+    </ul>
+</nav>

@@ -23,26 +23,16 @@ export class Login {
   login() {
     this.auth.login({ email: this.email, password: this.password }).subscribe({
       next: (res: any) => {
-        console.log(res);
         localStorage.setItem('token', res.token);
         localStorage.setItem('role', res.role);
         localStorage.setItem('name', res.name);
         localStorage.setItem('email', res.email);
 
-
-        // Role-based redirection
-        if (res.role === 'admin') {
-          this.router.navigate(['/admin-dashboard']);
-        } else if (res.role === 'manager') {
-          this.router.navigate(['/manager-dashboard']);
-        } else if (res.role === 'owner') {
-          this.router.navigate(['/owner-dashboard']);
-        } else {
-          this.error = 'Unknown user role';
-        }
+        //One-line dynamic dashboard redirect:
+        this.router.navigate([`/${res.role}-dashboard`]);
       },
-      error: () => {
-        this.error = 'Invalid credentials';
+      error: (err) => {
+        console.error('Login failed', err);
       }
     });
   }

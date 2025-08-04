@@ -24,26 +24,54 @@ conn = mysql.connector.connect(
     password="PRA24@123ab",
     database="kg_dashboard"
 )
-cursor = conn.cursor(dictionary=True)
 
 # --- Token store (in-memory; use DB for production) ---
 reset_tokens = {}
+
+# Create New User
+@app.route('/api/users', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    name = data.get('name')
+    email = data.get('email')
+    password = data.get('password')
+    role = data.get('role')
+    permissions = json.dumps(data.get('permissions', []))
+    phone = data.get('phone')
+
+    cursor = mysql.connection.cursor()
+    cursor.execute("""
+        INSERT INTO users (name, email, password, role, permissions, phone)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """, (name, email, password, role, permissions, phone))
+    mysql.connection.commit()
+    cursor.close()
+
+    return jsonify({"message": "User created successfully"}), 201
 
 # ✅ LOGIN ROUTE
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.json
+    cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM users WHERE email=%s AND password=%s", (data['email'], data['password']))
     user = cursor.fetchone()
 
     if user:
+        # Parse permissions from TEXT to list
+        user['permissions'] = json.loads(user['permissions']) if user['permissions'] else []
+
         return jsonify({
-            'token': 'token',
+            'success': True,
+            'token': 'token',  # Replace with JWT if needed
             'role': user['role'],
             'name': user['name'],
-            'email': user['email']
+            'email': user['email'],
+            'permissions': user['permissions']
         })
-    return jsonify({'error': 'Invalid credentials'}), 401
+    else:
+        return jsonify({"success": False, "message": "Invalid credentials"}), 401
+
 
 # ✅ FORGOT PASSWORD - Send Email with Reset Link
 @app.route('/api/forgot-password', methods=['POST'])

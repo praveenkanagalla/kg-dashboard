@@ -1,0 +1,19 @@
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">KG-{{ pageTitle }} Panel</div>
+        <app-sidebar class="sidebar-menu"></app-sidebar>
+    </aside>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <header class="header">
+            <h2>KG-{{ pageTitle }} Dashboard</h2>
+            <button class="logout-btn" (click)="logout()">Logout</button>
+        </header>
+
+        <main class="content-area">
+            <router-outlet></router-outlet>
+        </main>
+    </div>
+</div>
