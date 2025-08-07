@@ -8,7 +8,11 @@
     <!-- Main content -->
     <div class="main-content">
         <header class="header">
-            <h2>KG-{{ pageTitle }} Dashboard</h2>
+            <div>
+                <a [routerLink]="['/' + role + '-dashboard']">KG-{{ pageTitle }} Dashboard</a>
+                <h4>Welcome {{userName}}</h4>
+            </div>
+
             <button class="logout-btn" (click)="logout()">Logout</button>
         </header>
 

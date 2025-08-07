@@ -6,20 +6,21 @@ import mysql.connector
 import json
 import jwt
 import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # ------------------------------
-# Flask & Mail Setup
+# Flask Setup
 # ------------------------------
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": "http://localhost:4200"}})
 
 app.config.update(
-    SECRET_KEY='PRA24@123ab',  # required for JWT
+    SECRET_KEY='PRA24@123ab',
     MAIL_SERVER='smtp.gmail.com',
     MAIL_PORT=587,
     MAIL_USE_TLS=True,
     MAIL_USERNAME='praveenkumarkanagalla@gmail.com',
-    MAIL_PASSWORD='Praveen@123',  # ⚠️ use an app password in production
+    MAIL_PASSWORD='Praveen@123',  # ⚠️ Consider storing this securely in environment variables
 )
 
 mail = Mail(app)
@@ -37,39 +38,35 @@ def get_db_connection():
     )
 
 # ------------------------------
-# Token store (in-memory, for dev)
-# ------------------------------
-reset_tokens = {}
-
-# ------------------------------
 # Create New User
 # ------------------------------
 @app.route('/api/users', methods=['POST'])
 def create_user():
     data = request.json
-    conn = get_db_connection()
-    cursor = conn.cursor()
 
-    query = """
-        INSERT INTO users (name, email, password, phone, role, permissions)
-        VALUES (%s, %s, %s, %s, %s, %s)
-    """
-    cursor.execute(query, (
-        data['name'],
-        data['email'],
-        data['password'],
-        data['phone'],
-        data['role'],
-        json.dumps(data.get('permissions', []))
-    ))
-    conn.commit()
-    cursor.close()
-    conn.close()
+    name = data.get('name')
+    email = data.get('email')
+    raw_password = data.get('password')
+    hashed_password = generate_password_hash(raw_password)
+    phone = data.get('phone')
+    role = data.get('role')
+    permissions = json.dumps(data.get('permissions'))
 
-    return jsonify({'message': 'User created successfully'})
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO users (name, email, password, phone, role, permissions)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (name, email, hashed_password, phone, role, permissions))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'User created successfully'}), 201
+    except mysql.connector.Error as err:
+        return jsonify({'error': str(err)}), 400
 
 # ------------------------------
-# Login with JWT token
+# Login with JWT Token
 # ------------------------------
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -80,8 +77,9 @@ def login():
     user = cursor.fetchone()
     conn.close()
 
-    if user:
-        user['permissions'] = json.loads(user['permissions']) if user['permissions'] else []
+    if user:      
+        user['permissions'] = [row[0] for row in cursor.fetchall()]
+        
 
         payload = {
             'user_id': user['id'],
@@ -101,9 +99,9 @@ def login():
         })
     else:
         return jsonify({"success": False, "message": "Invalid credentials"}), 401
-
+        
 # ------------------------------
-# Forgot password
+# Forgot Password
 # ------------------------------
 @app.route('/api/forgot-password', methods=['POST'])
 def forgot_password():
@@ -132,7 +130,7 @@ def forgot_password():
     return jsonify({'message': 'Reset email sent successfully'})
 
 # ------------------------------
-# Reset password using token
+# Reset Password
 # ------------------------------
 @app.route('/api/reset-password', methods=['POST'])
 def reset_password():
@@ -147,24 +145,15 @@ def reset_password():
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE users SET password=%s WHERE email=%s", (new_password, email))
+    hashed_password = generate_password_hash(new_password)
+    cursor.execute("UPDATE users SET password=%s WHERE email=%s", (hashed_password, email))
     conn.commit()
     conn.close()
-
-    reset_tokens.pop(token, None)
 
     return jsonify({'message': 'Password reset successful.'})
 
 # ------------------------------
-# Optional alert email
-# ------------------------------
-def send_alert(subject, message, recipient):
-    msg = Message(subject, recipients=[recipient])
-    msg.body = message
-    mail.send(msg)
-
-# ------------------------------
-# Run the app
+# Run the App
 # ------------------------------
 if __name__ == '__main__':
     app.run(debug=True)

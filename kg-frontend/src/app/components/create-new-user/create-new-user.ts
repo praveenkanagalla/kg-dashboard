@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 
@@ -12,25 +12,16 @@ import { CommonModule } from '@angular/common';
 })
 export class CreateNewUser implements OnInit {
 
-  role = '';
   dropdownOpen = false;
-
-  toggleDropdown() {
-    this.dropdownOpen = !this.dropdownOpen;
-  }
-
   userForm: FormGroup;
-
-  roles = ['Owner', 'User', 'Manager-CLK', 'Manager-LB', 'Manager-KP'];
+  roles = ['Owner', 'User', 'ManagerCLK', 'ManagerLB', 'ManagerKP'];
 
   allPermissions = [
-    { name: 'Create User', route: 'create-new-user' },
-    { name: 'Employee List', route: 'employee-list' },
-    { name: 'Reports', route: 'reports' },
-    { name: 'Settings', route: 'settings' }
+    { name: 'Create User', route: '/create-new-user' }
   ];
 
-  permissionsList = [...this.allPermissions]; // default copy
+  permissionsList = [...this.allPermissions];
+  role = '';
 
   constructor(private fb: FormBuilder, private http: HttpClient) {
     this.userForm = this.fb.group({
@@ -43,26 +34,41 @@ export class CreateNewUser implements OnInit {
     });
   }
 
-  ngOnInit() {
-    this.role = localStorage.getItem('role') || '';
+  ngOnInit(): void {
+    this.role = localStorage.getItem('role') ?? '';
 
-    if (this.role.toLowerCase() === 'admin' || this.role.toLowerCase() === 'owner') {
-      // Admin or Owner sees all permissions
+    if (this.role.toLowerCase() === 'admin') {
+      // Admin sees all permissions
       this.permissionsList = [...this.allPermissions];
     } else {
-      // Other users see only allowed permissions
-      const allowedRoutes: string[] = JSON.parse(localStorage.getItem('access') || '[]');
-      this.permissionsList = this.allPermissions.filter(p => allowedRoutes.includes(p.route));
+      // Non-admin: get permissions array from localStorage
+      const permissionsRaw = localStorage.getItem('permissions') ?? '[]';
+
+      let allowedPermissions: string[] = [];
+      try {
+        allowedPermissions = JSON.parse(permissionsRaw);
+        if (!Array.isArray(allowedPermissions)) {
+          allowedPermissions = [];
+        }
+      } catch {
+        allowedPermissions = [];
+      }
+
+      // Filter allPermissions by matching names exactly
+      this.permissionsList = this.allPermissions.filter(p =>
+        allowedPermissions.includes(p.name)
+      );
+
+      console.log('Loaded permissions from localStorage:', allowedPermissions);
     }
+
+    // Debug logs (remove in production)
+    console.log('All available permissions:', this.allPermissions.map(p => p.name));
+    console.log('Filtered permissionsList:', this.permissionsList.map(p => p.name));
   }
 
-  onSubmit() {
-    if (this.userForm.valid) {
-      this.http.post('http://localhost:5000/api/users', this.userForm.value).subscribe({
-        next: () => alert('User created successfully'),
-        error: () => alert('Error creating user')
-      });
-    }
+  toggleDropdown() {
+    this.dropdownOpen = !this.dropdownOpen;
   }
 
   selectedPermissionsLabel(): string {
@@ -74,13 +80,26 @@ export class CreateNewUser implements OnInit {
   onAccessChange(event: any) {
     const current = this.userForm.get('permissions')?.value || [];
     if (event.target.checked) {
-      if (!current.includes(event.target.value)) {
-        current.push(event.target.value);
-      }
+      if (!current.includes(event.target.value)) current.push(event.target.value);
     } else {
       const index = current.indexOf(event.target.value);
       if (index > -1) current.splice(index, 1);
     }
     this.userForm.patchValue({ permissions: current });
+  }
+
+  onSubmit() {
+    if (this.userForm.valid) {
+      this.http.post('http://localhost:5000/api/users', this.userForm.value).subscribe({
+        next: () => {
+          alert('User created successfully');
+          this.userForm.reset();
+          this.dropdownOpen = false;
+        },
+        error: (err) => {
+          alert('Error creating user: ' + (err.error?.error || err.message));
+        }
+      });
+    }
   }
 }

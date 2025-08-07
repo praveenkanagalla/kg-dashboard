@@ -11,6 +11,8 @@ import { Sidebar } from '../../components/sidebar/sidebar';
 })
 export class Dashboard implements OnInit {
   pageTitle: string = '';
+  userName: string = '';
+  role: string = '';
 
   constructor(private route: ActivatedRoute) { }
 
@@ -18,6 +20,9 @@ export class Dashboard implements OnInit {
     const routeSegment = this.route.snapshot.paramMap.get('role-dashboard');
     const role = routeSegment?.split('-')[0];
     this.pageTitle = role ? `${this.capitalize(role)}` : '';
+    const storedName = localStorage.getItem('name') || '';
+    this.userName = storedName ? this.capitalize(storedName) : '';
+    this.role = localStorage.getItem('role') || '';
   }
 
   capitalize(word: string): string {

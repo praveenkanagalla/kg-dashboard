@@ -13,9 +13,10 @@
     <label>Phone</label>
     <input formControlName="phone" type="text" />
 
-    <label>Role</label>
-    <select formControlName="role">
-        <option *ngFor="let role of roles" [value]="role" aria-placeholder="select">{{ role }}</option>
+    <label>Role:</label>
+    <select formControlName="role" required>
+        <option value="" disabled>Select Role</option>
+        <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
     </select>
 
     <label>Access Permissions</label>
