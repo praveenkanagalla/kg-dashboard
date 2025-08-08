@@ -8,6 +8,7 @@ import jwt
 import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
+
 # ------------------------------
 # Flask Setup
 # ------------------------------
@@ -42,28 +43,75 @@ def get_db_connection():
 # ------------------------------
 @app.route('/api/users', methods=['POST'])
 def create_user():
-    data = request.json
-
+    data = request.json or {}
     name = data.get('name')
     email = data.get('email')
-    raw_password = data.get('password')
-    hashed_password = generate_password_hash(raw_password)
-    phone = data.get('phone')
-    role = data.get('role')
-    permissions = json.dumps(data.get('permissions'))
+    password = data.get('password')
+    phone = data.get('phone', '')
+    role = data.get('role', '')
+    permissions = data.get('permissions', [])  # expected array
+
+    if not (name and email and password):
+        return jsonify({"error": "name, email and password are required"}), 400
+
 
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
+        permissions_json = json.dumps(permissions)  # store as JSON string
         cursor.execute("""
             INSERT INTO users (name, email, password, phone, role, permissions)
             VALUES (%s, %s, %s, %s, %s, %s)
-        """, (name, email, hashed_password, phone, role, permissions))
+        """, (name, email, password, phone, role, permissions_json))
         conn.commit()
+        inserted_id = cursor.lastrowid
+        cursor.close()
         conn.close()
-        return jsonify({'message': 'User created successfully'}), 201
+
+        # return created user (without password) — return permissions as array
+        return jsonify({
+            "id": inserted_id,
+            "name": name,
+            "email": email,
+            "phone": phone,
+            "role": role,
+            "permissions": permissions
+        }), 201
+
     except mysql.connector.Error as err:
-        return jsonify({'error': str(err)}), 400
+        return jsonify({"error": str(err)}), 400
+
+@app.route('/get_users', methods=['GET'])
+def get_users():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT id, name, email, phone, role, permissions FROM users ORDER BY id DESC")
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        users = []
+        for r in rows:
+            perms = r.get('permissions')
+            try:
+                # if stored as JSON string, parse to list; if already list, use it
+                parsed = json.loads(perms) if isinstance(perms, str) and perms else (perms if isinstance(perms, list) else [])
+            except Exception:
+                parsed = []
+            users.append({
+                "id": r.get('id'),
+                "name": r.get('name'),
+                "email": r.get('email'),
+                "phone": r.get('phone'),
+                "role": r.get('role'),
+                "permissions": parsed
+            })
+
+        return jsonify(users)
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
 
 # ------------------------------
 # Login with JWT Token
@@ -145,8 +193,8 @@ def reset_password():
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    hashed_password = generate_password_hash(new_password)
-    cursor.execute("UPDATE users SET password=%s WHERE email=%s", (hashed_password, email))
+    password = generate_password_hash(new_password)
+    cursor.execute("UPDATE users SET password=%s WHERE email=%s", (password, email))
     conn.commit()
     conn.close()
 
