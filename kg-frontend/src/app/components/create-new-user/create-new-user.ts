@@ -21,8 +21,6 @@ export class CreateNewUser implements OnInit {
 
   allPermissions = [
     { name: 'Create User', route: 'create-new-user' },
-    { name: 'Employee List', route: 'employee-list' },
-    { name: 'Reports', route: 'reports' },
     { name: 'Settings', route: 'settings' }
   ];
 
@@ -42,13 +40,13 @@ export class CreateNewUser implements OnInit {
   ngOnInit() {
     this.role = localStorage.getItem('role') || '';
 
-    if (this.role.toLowerCase() === 'admin' || this.role.toLowerCase() === 'owner') {
+    if (this.role.toLowerCase() === 'admin') {
       // Admin or Owner gets full permission list
       this.permissionsList = [...this.allPermissions];
     } else {
       // Other users only see permissions they have access to
       const allowedRoutes: string[] = JSON.parse(localStorage.getItem('access') || '[]');
-      this.permissionsList = this.allPermissions.filter(p => allowedRoutes.includes(p.route));
+      this.permissionsList = this.allPermissions.filter(p => allowedRoutes.includes(p.name));
     }
   }
 
@@ -60,7 +58,7 @@ export class CreateNewUser implements OnInit {
     const selected = this.userForm.get('permissions')?.value;
     if (!selected || selected.length === 0) return 'Select Permissions';
     return selected.map((route: string) => {
-      const perm = this.allPermissions.find(p => p.route === route);
+      const perm = this.allPermissions.find(p => p.name === route);
       return perm ? perm.name : route;
     }).join(', ');
   }

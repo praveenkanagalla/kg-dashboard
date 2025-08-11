@@ -4,10 +4,14 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private tokenKey = 'auth_token';
+  private roleKey = 'role';
+  private permissionsKey = 'permissions';
   private baseUrl = 'http://localhost:5000/api';
 
   constructor(private http: HttpClient) { }
 
+  // ===== Authentication =====
   register(data: any) {
     return this.http.post(`${this.baseUrl}/register`, data);
   }
@@ -25,32 +29,84 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.clear();
+    localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.roleKey);
+    localStorage.removeItem(this.permissionsKey);
   }
 
-  isLoggedIn() {
-    return !!localStorage.getItem('token');
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem(this.tokenKey);
   }
 
-  getUserRole() {
-    return localStorage.getItem('role');
+  // ===== Token =====
+  getToken(): string | null {
+    return localStorage.getItem('token');
   }
 
-  getRoleFromToken(): string | null {
-    const token = localStorage.getItem('token');
+  setToken(token: string) {
+    localStorage.setItem(this.tokenKey, token);
+  }
+
+  decodeToken(): any | null {
+    const token = this.getToken();
     if (!token) return null;
-
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.identity?.role || null;
+      return payload;
     } catch {
       return null;
     }
   }
 
-  getData(endpoint: string): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get(`http://localhost:5000/${endpoint}`, { headers });
+  // ===== Role =====
+  setRole(role: string) {
+    localStorage.setItem(this.roleKey, role);
   }
+
+  getRole(): string {
+    return localStorage.getItem('role') || '';
+  }
+
+  getRoleFromToken(): string | null {
+    const payload = this.decodeToken();
+    return payload?.identity?.role || null;
+  }
+
+  // ===== Permissions =====
+  setPermissions(permissions: string[]) {
+    localStorage.setItem(this.permissionsKey, JSON.stringify(permissions));
+  }
+
+  getPermissions(): string[] {
+    return JSON.parse(localStorage.getItem('permissions') || '[]');
+  }
+
+  hasPermission(permission: string): boolean {
+    const role = this.getRole().toLowerCase();
+    if (role === 'admin') return true;
+
+    const permissions = this.getPermissions().map(p => p.toLowerCase().trim());
+    return permissions.includes(permission.toLowerCase().trim());
+  }
+
+  // ===== Combined User Data Save =====
+  setUserData(token: string, role: string, permissions: string[]) {
+    this.setToken(token);
+    this.setRole(role);
+    this.setPermissions(permissions);
+  }
+
+  // ===== API Requests with Token =====
+  getData(endpoint: string): Observable<any> {
+    const token = this.getToken();
+    const headers = token
+      ? new HttpHeaders().set('Authorization', `Bearer ${token}`)
+      : new HttpHeaders();
+    return this.http.get(`${this.baseUrl}/${endpoint}`, { headers });
+  }
+
+
+
+
+
 }

@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { Sidebar } from '../../components/sidebar/sidebar';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterModule, Sidebar],
+  imports: [RouterModule, Sidebar, CommonModule],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css'],
 })
