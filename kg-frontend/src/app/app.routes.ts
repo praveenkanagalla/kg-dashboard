@@ -18,12 +18,14 @@ export const routes: Routes = [
             {
                 path: 'create-new-user',
                 component: CreateNewUser,
-                canActivate: [PermissionGuard]
+                canActivate: [PermissionGuard],
+                data: { permission: 'view_create_new_user' }
             },
             {
                 path: 'settings',
                 component: Settings,
-                canActivate: [PermissionGuard]
+                canActivate: [PermissionGuard],
+                data: { permission: 'view_settings' }
             }
 
             // more children

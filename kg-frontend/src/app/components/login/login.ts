@@ -28,11 +28,13 @@ export class Login {
         // Store additional info if you want
         localStorage.setItem('name', res.name);
         localStorage.setItem('email', res.email);
+        localStorage.setItem('role', res.role);
+        localStorage.setItem('permissions', res.permissions);
+        localStorage.setItem('token', res.token);
 
         // Navigate dynamically based on role
 
         this.router.navigate([`/${res.role}-dashboard`]);
-        this.auth.setUserData(res.token, res.role, res.permissions || ['hello']);
       },
       error: (err) => {
         console.error('Login failed', err);

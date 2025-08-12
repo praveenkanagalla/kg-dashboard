@@ -29,8 +29,8 @@
         <div class="dropdown-list" *ngIf="dropdownOpen">
             <!-- Loop over filtered permissionsList -->
             <label *ngFor="let perm of permissionsList">
-                <input type="checkbox" [value]="perm.name"
-                    [checked]="(userForm.get('permissions')?.value || []).includes(perm.name)"
+                <input type="checkbox" [value]="perm.route"
+                    [checked]="(userForm.get('permissions')?.value || []).includes(perm.route)"
                     (change)="onAccessChange($event)" />
                 {{ perm.name }}
             </label>

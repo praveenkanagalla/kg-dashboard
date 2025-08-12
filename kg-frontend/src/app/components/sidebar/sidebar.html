@@ -1,15 +1,10 @@
 <div class="sidebar">
     <ul>
-        <li *ngIf="hasPermission('create-new-user')">
-            <a
-                [routerLink]="role.toLowerCase() === 'admin' ? ['/create-new-user'] : ['/', roleDashboard, 'create-new-user']">
-                Create New User
-            </a>
+        <li *ngIf="auth.hasPermission('view_create_new_user')">
+            <a [routerLink]="getCreateUserLink()">Create New User</a>
         </li>
-        <li *ngIf="hasPermission('settings')">
-            <a [routerLink]="role.toLowerCase() === 'admin' ? ['/settings'] : ['/', roleDashboard, 'settings']">
-                Settings
-            </a>
+        <li *ngIf="auth.hasPermission('view_settings')">
+            <a [routerLink]="getSettingsLink()">Settings</a>
         </li>
     </ul>
 </div>

@@ -9,7 +9,12 @@ export class AuthService {
   private permissionsKey = 'permissions';
   private baseUrl = 'http://localhost:5000/api';
 
-  constructor(private http: HttpClient) { }
+  private permissions: string[] = [];
+
+  constructor(private http: HttpClient) {
+    // Load permissions from localStorage on service creation
+    this.permissions = this.getPermissions();
+  }
 
   // ===== Authentication =====
   register(data: any) {
@@ -32,6 +37,7 @@ export class AuthService {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.roleKey);
     localStorage.removeItem(this.permissionsKey);
+    this.permissions = [];
   }
 
   isLoggedIn(): boolean {
@@ -40,7 +46,7 @@ export class AuthService {
 
   // ===== Token =====
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return localStorage.getItem(this.tokenKey);
   }
 
   setToken(token: string) {
@@ -64,7 +70,7 @@ export class AuthService {
   }
 
   getRole(): string {
-    return localStorage.getItem('role') || '';
+    return localStorage.getItem(this.roleKey) || '';
   }
 
   getRoleFromToken(): string | null {
@@ -75,18 +81,30 @@ export class AuthService {
   // ===== Permissions =====
   setPermissions(permissions: string[]) {
     localStorage.setItem(this.permissionsKey, JSON.stringify(permissions));
+    this.permissions = permissions;
   }
 
   getPermissions(): string[] {
-    return JSON.parse(localStorage.getItem('permissions') || '[]');
+    return JSON.parse(localStorage.getItem(this.permissionsKey) || '[]');
   }
 
   hasPermission(permission: string): boolean {
     const role = this.getRole().toLowerCase();
-    if (role === 'admin') return true;
+    if (role === 'admin') return true; // Admin has all permissions
 
     const permissions = this.getPermissions().map(p => p.toLowerCase().trim());
     return permissions.includes(permission.toLowerCase().trim());
+  }
+
+  // ===== Role Dashboard Mapping =====
+  getRoleDashboard(): string {
+    const role = this.getRole().toLowerCase();
+    const map: { [key: string]: string } = {
+      admin: 'admin-dashboard',
+      manager: 'manager-dashboard',
+      user: 'user-dashboard'
+    };
+    return map[role] || 'default-dashboard';
   }
 
   // ===== Combined User Data Save =====
@@ -104,9 +122,4 @@ export class AuthService {
       : new HttpHeaders();
     return this.http.get(`${this.baseUrl}/${endpoint}`, { headers });
   }
-
-
-
-
-
 }

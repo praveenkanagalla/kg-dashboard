@@ -121,32 +121,38 @@ def login():
     data = request.json
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
+
+    # Step 1: Find the user
     cursor.execute("SELECT * FROM users WHERE email=%s AND password=%s", (data['email'], data['password']))
     user = cursor.fetchone()
+
+    if not user:
+        conn.close()
+        return jsonify({"success": False, "message": "Invalid credentials"}), 401
+
+    # Step 2: Fetch permissions for that user
+    cursor.execute("SELECT permission_name FROM permissions WHERE user_id=%s", (user['id'],))
+    permissions = [row['permission_name'] for row in cursor.fetchall()]
+
     conn.close()
 
-    if user:      
-        user['permissions'] = [row[0] for row in cursor.fetchall()]
-        
+    # Step 3: Create token
+    payload = {
+        'user_id': user['id'],
+        'email': user['email'],
+        'role': user['role'],
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=12)
+    }
+    token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
 
-        payload = {
-            'user_id': user['id'],
-            'email': user['email'],
-            'role': user['role'],
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=12)
-        }
-        token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
-
-        return jsonify({
-            'success': True,
-            'token': token,
-            'role': user['role'],
-            'name': user['name'],
-            'email': user['email'],
-            'permissions': user['permissions']
-        })
-    else:
-        return jsonify({"success": False, "message": "Invalid credentials"}), 401
+    return jsonify({
+        'success': True,
+        'token': token,
+        'role': user['role'],
+        'name': user['name'],
+        'email': user['email'],
+        'permissions': permissions
+    })
         
 # ------------------------------
 # Forgot Password

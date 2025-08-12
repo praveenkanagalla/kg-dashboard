@@ -1,27 +1,41 @@
+// permission-guard.ts
 import { Injectable } from '@angular/core';
-import { CanActivate, Router, ActivatedRouteSnapshot } from '@angular/router';
+import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import { AuthService } from './service/auth';
 
 @Injectable({ providedIn: 'root' })
 export class PermissionGuard implements CanActivate {
   constructor(private auth: AuthService, private router: Router) { }
 
-  canActivate(route: ActivatedRouteSnapshot): boolean {
-    const requiredPermission = route.data['permission'];
-    const userRole = this.auth.getRole();
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+    // ===== 1. Check role matches the URL =====
+    const roleDashboard = route.parent?.params['role-dashboard']; // e.g. "admin-dashboard"
+    const userRoleDashboard = this.auth.getRoleDashboard(); // e.g. "admin-dashboard"
 
-    // Admin role bypasses all permission checks
-    if (userRole.toLowerCase() === 'admin') {
-      return true;
+    if (roleDashboard && roleDashboard !== userRoleDashboard) {
+      this.router.navigate(['/login']);
+      return false;
     }
 
-    // Check for required permission
-    if (requiredPermission && this.auth.hasPermission(requiredPermission)) {
-      return true;
+    // ===== 2. Determine required permission =====
+    let requiredPermission = route.data?.['permission'] as string | undefined;
+
+    // If no explicit permission in route data, fallback to hardcoded map
+    if (!requiredPermission) {
+      const routePath = route.routeConfig?.path || '';
+      const permissionMap: { [key: string]: string } = {
+        'create-new-user': 'view_create_new_user',
+        'settings': 'view_settings'
+      };
+      requiredPermission = permissionMap[routePath];
     }
 
-    // Redirect to no-access page if not authorized
-    // this.router.navigate(['/no-access']);
-    return false;
+    // ===== 3. If permission required, check it =====
+    if (requiredPermission && !this.auth.hasPermission(requiredPermission)) {
+      this.router.navigate([`/${userRoleDashboard}`]); // back to dashboard
+      return false;
+    }
+
+    return true;
   }
 }

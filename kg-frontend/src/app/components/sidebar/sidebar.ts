@@ -84,4 +84,11 @@ export class Sidebar implements OnInit {
     console.log('Allowed?', allowed);
     return allowed;
   }
+
+  getCreateUserLink(): string[] {
+    return ['/', this.auth.getRoleDashboard(), 'create-new-user'];
+  }
+  getSettingsLink(): string[] {
+    return ['/', this.auth.getRoleDashboard(), 'settings'];
+  }
 }

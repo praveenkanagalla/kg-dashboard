@@ -46,7 +46,7 @@ export class CreateNewUser implements OnInit {
     } else {
       // Other users only see permissions they have access to
       const allowedRoutes: string[] = JSON.parse(localStorage.getItem('access') || '[]');
-      this.permissionsList = this.allPermissions.filter(p => allowedRoutes.includes(p.name));
+      this.permissionsList = this.allPermissions.filter(p => allowedRoutes.includes(p.route));
     }
   }
 
