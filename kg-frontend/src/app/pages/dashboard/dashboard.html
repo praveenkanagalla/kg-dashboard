@@ -12,8 +12,13 @@
                 <a [routerLink]="['/' + role + '-dashboard']">KG-{{ pageTitle }} Dashboard</a>
                 <h4>Welcome {{userName}}</h4>
             </div>
-
-            <button class="logout-btn" (click)="logout()">Logout</button>
+            <div class="user-details-content">
+                <a *ngIf="user" [routerLink]="['/' + role + '-dashboard' + '-user', userId]" class="user-details">
+                    <img src="../../../assets/user-1.png" alt="icon" class="user-icon">
+                    <span class="user-text">User Details</span>
+                </a>
+                <button class="logout-btn" (click)="logout()">Logout</button>
+            </div>
         </header>
 
         <main class="content-area">

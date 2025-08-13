@@ -149,6 +149,61 @@ def add_permissions():
         return jsonify({'success': True, 'message': 'Permissions saved'}), 201
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
+    
+
+# ------------------------------
+# Get All Users
+# ------------------------------
+@app.route('/get_users', methods=['GET'], endpoint='get_users_list')
+def get_users():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT id, name, email, phone, role, blood_group, address FROM users ORDER BY id DESC")
+        users = cursor.fetchall()
+
+        for user in users:
+            cursor.execute("SELECT permissions FROM permissions WHERE user_id=%s", (user['id'],))
+            row = cursor.fetchone()
+            user['permissions'] = json.loads(row['permissions']) if row else []
+
+        cursor.close()
+        conn.close()
+        return jsonify(users)
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
+
+# ------------------------------
+# Get Single User
+# ------------------------------
+@app.route('/api/users/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            "SELECT id, name, email, phone, role, blood_group, address FROM users WHERE id=%s",
+            (user_id,)
+        )
+        user = cursor.fetchone()
+        if not user:
+            cursor.close()
+            conn.close()
+            return jsonify({"error": "User not found"}), 404
+
+        cursor.execute("SELECT permissions FROM permissions WHERE user_id=%s", (user_id,))
+        row = cursor.fetchone()
+        user['permissions'] = json.loads(row['permissions']) if row else []
+
+        cursor.close()
+        conn.close()
+        return jsonify(user)
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
 
 # ------------------------------
 # Login with JWT
@@ -159,6 +214,7 @@ def login():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
+    # Check user credentials
     cursor.execute(
         "SELECT * FROM users WHERE email=%s AND password=%s",
         (data['email'], data['password'])
@@ -169,13 +225,16 @@ def login():
         conn.close()
         return jsonify({"success": False, "message": "Invalid credentials"}), 401
 
+    # Get user permissions
     cursor.execute("SELECT permissions FROM permissions WHERE user_id=%s", (user['id'],))
     row = cursor.fetchone()
     permissions = json.loads(row['permissions']) if row else []
 
     conn.close()
 
+    # JWT payload
     payload = {
+        "id": user["id"],
         'user_id': user['id'],
         'email': user['email'],
         'role': user['role'],
@@ -184,14 +243,17 @@ def login():
     }
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
 
+    # Return JSON including userId for Angular localStorage
     return jsonify({
         'success': True,
         'token': token,
+        'userId': user['id'],        # <-- added this line
         'role': user['role'],
         'name': user['name'],
         'email': user['email'],
         'permissions': permissions
     })
+
 
 # ------------------------------
 # Forgot Password

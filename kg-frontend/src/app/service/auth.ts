@@ -45,6 +45,8 @@ export class AuthService {
     localStorage.setItem('email', res.email);
     this.setPermissions(res.permissions || []);
     localStorage.setItem('permissions', JSON.stringify(res.permissions));
+    localStorage.setItem('userId', res.userId.toString());
+    localStorage.setItem('user', JSON.stringify(res));
   }
 
   setToken(token: string) {

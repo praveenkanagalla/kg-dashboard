@@ -20,8 +20,8 @@ export class CreateNewUser implements OnInit {
   roles = ['Owner', 'User', 'ManagerCLK', 'ManagerLB', 'ManagerKP', 'Admin'];
 
   allPermissions = [
-    { name: 'Create User', route: 'create-new-user' },
-    { name: 'Settings', route: 'settings' }
+    { name: 'Create User', route: 'view_create_new_user' },
+    { name: 'Settings', route: 'view_settings' }
   ];
 
   permissionsList = [...this.allPermissions]; // filtered in ngOnInit
