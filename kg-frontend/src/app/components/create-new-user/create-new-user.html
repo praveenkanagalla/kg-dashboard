@@ -19,6 +19,24 @@
         <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
     </select>
 
+    <!-- New Blood Group field -->
+    <label>Blood Group</label>
+    <select formControlName="blood_group" required>
+        <option value="" disabled>Select Blood Group</option>
+        <option value="A+">A+</option>
+        <option value="A-">A-</option>
+        <option value="B+">B+</option>
+        <option value="B-">B-</option>
+        <option value="O+">O+</option>
+        <option value="O-">O-</option>
+        <option value="AB+">AB+</option>
+        <option value="AB-">AB-</option>
+    </select>
+
+    <!-- New Address field -->
+    <label>Address</label>
+    <textarea formControlName="address" rows="3"></textarea>
+
     <label>Access Permissions</label>
     <div class="dropdown-checkbox">
         <div class="dropdown-header" (click)="toggleDropdown()">

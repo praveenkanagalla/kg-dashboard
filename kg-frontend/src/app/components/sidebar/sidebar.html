@@ -1,10 +1,10 @@
 <div class="sidebar">
     <ul>
-        <li *ngIf="auth.hasPermission('view_create_new_user')">
-            <a [routerLink]="getCreateUserLink()">Create New User</a>
+        <li>
+            <a *ngIf="auth.hasPermission('view_settings')" [routerLink]="getSettingsLink()">Settings</a>
         </li>
-        <li *ngIf="auth.hasPermission('view_settings')">
-            <a [routerLink]="getSettingsLink()">Settings</a>
+        <li>
+            <a *ngIf="auth.hasPermission('view_create_new_user')" [routerLink]="getCreateUserLink()">Create New User</a>
         </li>
     </ul>
 </div>

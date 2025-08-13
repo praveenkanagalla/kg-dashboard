@@ -22,22 +22,15 @@ export class Login {
   login() {
     this.auth.login({ email: this.email, password: this.password }).subscribe({
       next: (res: any) => {
-        // Set token, role, and permissions inside auth service (manages localStorage)
+        this.auth.saveUserData(res);
 
+        console.log('Logged in user permissions:', res.permissions);
+        console.log('Permissions from localStorage:', JSON.parse(localStorage.getItem('permissions') || '[]'));
 
-        // Store additional info if you want
-        localStorage.setItem('name', res.name);
-        localStorage.setItem('email', res.email);
-        localStorage.setItem('role', res.role);
-        localStorage.setItem('permissions', res.permissions);
-        localStorage.setItem('token', res.token);
-
-        // Navigate dynamically based on role
-
+        // Redirect based on role
         this.router.navigate([`/${res.role}-dashboard`]);
       },
-      error: (err) => {
-        console.error('Login failed', err);
+      error: () => {
         this.error = 'Invalid email or password.';
       }
     });

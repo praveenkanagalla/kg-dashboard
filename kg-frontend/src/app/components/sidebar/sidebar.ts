@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { AuthService } from '../../service/auth'; // import AuthService
+import { AuthService } from '../../service/auth';
 
 @Component({
   selector: 'app-sidebar',
@@ -21,10 +21,9 @@ export class Sidebar implements OnInit {
   role: string = '';
   roleDashboard: string = '';
 
-  // Master permission list - add all your app routes/components here
   allPermissions = [
-    { name: 'Create User', route: 'create-new-user' },
-    { name: 'Settings', route: 'settings' }
+    { name: 'Create User', route: 'view_create_new_user' },
+    { name: 'Settings', route: 'view_settings' }
   ];
 
   constructor(private http: HttpClient, public auth: AuthService) { }
@@ -38,8 +37,9 @@ export class Sidebar implements OnInit {
     const token = this.auth.getToken();
     if (token) {
       try {
-        const decoded: any = (this.auth as any).decodeToken(token);
-        this.role = decoded.role || '';
+        // Use your AuthService decodeToken method or fallback to localStorage role
+        const decoded: any = (this.auth as any).decodeToken ? (this.auth as any).decodeToken(token) : null;
+        this.role = decoded?.role || this.auth.getRole();
         this.roleDashboard = this.role.toLowerCase() + '-dashboard';
       } catch {
         this.role = '';
@@ -73,21 +73,16 @@ export class Sidebar implements OnInit {
       }
     });
   }
+
   hasPermission(permission: string): boolean {
-    const role = this.auth.getRole().toLowerCase();
-    console.log('Checking permission:', permission, 'for role:', role);
-    if (role === 'admin') {
-      console.log('Admin detected, allowing all.');
-      return true;
-    }
     const allowed = this.auth.hasPermission(permission);
-    console.log('Allowed?', allowed);
     return allowed;
   }
 
   getCreateUserLink(): string[] {
     return ['/', this.auth.getRoleDashboard(), 'create-new-user'];
   }
+
   getSettingsLink(): string[] {
     return ['/', this.auth.getRoleDashboard(), 'settings'];
   }

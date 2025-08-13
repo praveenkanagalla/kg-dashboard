@@ -24,7 +24,7 @@ export class CreateNewUser implements OnInit {
     { name: 'Settings', route: 'settings' }
   ];
 
-  permissionsList = [...this.allPermissions]; // Will be filtered in ngOnInit
+  permissionsList = [...this.allPermissions]; // filtered in ngOnInit
 
   constructor(private fb: FormBuilder, private http: HttpClient) {
     this.userForm = this.fb.group({
@@ -33,6 +33,8 @@ export class CreateNewUser implements OnInit {
       password: ['', Validators.required],
       phone: ['', Validators.required],
       role: ['', Validators.required],
+      blood_group: ['', Validators.required], // Added Blood Group
+      address: [''],                           // Added Address (optional)
       permissions: [[]]
     });
   }
@@ -55,16 +57,21 @@ export class CreateNewUser implements OnInit {
   }
 
   selectedPermissionsLabel(): string {
-    const selected = this.userForm.get('permissions')?.value;
-    if (!selected || selected.length === 0) return 'Select Permissions';
-    return selected.map((route: string) => {
-      const perm = this.allPermissions.find(p => p.name === route);
-      return perm ? perm.name : route;
-    }).join(', ');
+    const selectedRoutes: string[] = this.userForm.get('permissions')?.value || [];
+    if (selectedRoutes.length === 0) return 'Select Permissions';
+
+    if (selectedRoutes.length === this.permissionsList.length) return 'All Permissions';
+
+    return selectedRoutes
+      .map(route => {
+        const perm = this.allPermissions.find(p => p.route === route);
+        return perm ? perm.name : route;
+      })
+      .join(', ');
   }
 
   onAccessChange(event: any) {
-    const current = this.userForm.get('permissions')?.value || [];
+    const current: string[] = this.userForm.get('permissions')?.value || [];
     if (event.target.checked) {
       if (!current.includes(event.target.value)) {
         current.push(event.target.value);
@@ -78,13 +85,26 @@ export class CreateNewUser implements OnInit {
 
   onSubmit() {
     if (this.userForm.valid) {
-      this.http.post('http://localhost:5000/api/users', this.userForm.value).subscribe({
-        next: () => {
-          alert('User created successfully');
-          this.userForm.reset({ permissions: [] });
+      this.http.post<{ id: number }>('http://localhost:5000/api/users', this.userForm.value).subscribe({
+        next: (userRes) => {
+          const userId = userRes.id;
+          const permissionsData = {
+            user_id: userId,
+            permissions: this.userForm.value.permissions || []
+          };
+
+          this.http.post('http://localhost:5000/api/permissions', permissionsData).subscribe({
+            next: () => {
+              alert('User and permissions created successfully');
+              this.userForm.reset({ permissions: [] });
+            },
+            error: () => alert('Error creating permissions')
+          });
         },
         error: () => alert('Error creating user')
       });
+    } else {
+      this.userForm.markAllAsTouched();
     }
   }
 }

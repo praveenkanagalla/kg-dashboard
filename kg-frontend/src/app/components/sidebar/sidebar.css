@@ -30,7 +30,7 @@
 }
 
 .active-link {
-    background-color: #b7b2b2;
+    background-color: #b7b2b2 !important;
     color: #682f12 !important;
     font-weight: bold;
 }

@@ -8,7 +8,6 @@ import jwt
 import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
-
 # ------------------------------
 # Flask Setup
 # ------------------------------
@@ -21,7 +20,7 @@ app.config.update(
     MAIL_PORT=587,
     MAIL_USE_TLS=True,
     MAIL_USERNAME='praveenkumarkanagalla@gmail.com',
-    MAIL_PASSWORD='Praveen@123',  # ⚠️ Consider storing this securely in environment variables
+    MAIL_PASSWORD='Praveen@123',  # ⚠️ Store securely in env variables
 )
 
 mail = Mail(app)
@@ -39,6 +38,29 @@ def get_db_connection():
     )
 
 # ------------------------------
+# Helper: Save Permissions
+# ------------------------------
+def save_permissions(user_id, permissions_list):
+    """Store all permissions as JSON in a single row"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Normalize
+    normalized = [perm.strip().lower() for perm in permissions_list]
+
+    # Delete old row
+    cursor.execute("DELETE FROM permissions WHERE user_id = %s", (user_id,))
+    # Insert new row
+    cursor.execute(
+        "INSERT INTO permissions (user_id, permissions) VALUES (%s, %s)",
+        (user_id, json.dumps(normalized))
+    )
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+# ------------------------------
 # Create New User
 # ------------------------------
 @app.route('/api/users', methods=['POST'])
@@ -49,72 +71,87 @@ def create_user():
     password = data.get('password')
     phone = data.get('phone', '')
     role = data.get('role', '')
-    permissions = data.get('permissions', [])  # expected array
+    blood_group = data.get('blood_group', '')
+    address = data.get('address', '')
+    permissions = data.get('permissions', [])  # optional permissions array
 
-    if not (name and email and password):
-        return jsonify({"error": "name, email and password are required"}), 400
-
+    if not (name and email and password and blood_group):
+        return jsonify({"error": "name, email, password and blood_group are required"}), 400
 
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        permissions_json = json.dumps(permissions)  # store as JSON string
         cursor.execute("""
-            INSERT INTO users (name, email, password, phone, role, permissions)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (name, email, password, phone, role, permissions_json))
+            INSERT INTO users (name, email, password, phone, role, blood_group, address)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (name, email, password, phone, role, blood_group, address))
         conn.commit()
         inserted_id = cursor.lastrowid
         cursor.close()
         conn.close()
 
-        # return created user (without password) — return permissions as array
+        # Save permissions if provided
+        if permissions:
+            save_permissions(inserted_id, permissions)
+
         return jsonify({
             "id": inserted_id,
             "name": name,
             "email": email,
             "phone": phone,
             "role": role,
+            "blood_group": blood_group,
+            "address": address,
             "permissions": permissions
         }), 201
 
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 400
 
+# ------------------------------
+# Get Users
+# ------------------------------
 @app.route('/get_users', methods=['GET'])
 def get_users():
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT id, name, email, phone, role, permissions FROM users ORDER BY id DESC")
-        rows = cursor.fetchall()
+
+        cursor.execute("SELECT id, name, email, phone, role, blood_group, address FROM users ORDER BY id DESC")
+        users = cursor.fetchall()
+
+        for user in users:
+            cursor.execute("SELECT permissions FROM permissions WHERE user_id=%s", (user['id'],))
+            row = cursor.fetchone()
+            user['permissions'] = json.loads(row['permissions']) if row else []
+
         cursor.close()
         conn.close()
-
-        users = []
-        for r in rows:
-            perms = r.get('permissions')
-            try:
-                # if stored as JSON string, parse to list; if already list, use it
-                parsed = json.loads(perms) if isinstance(perms, str) and perms else (perms if isinstance(perms, list) else [])
-            except Exception:
-                parsed = []
-            users.append({
-                "id": r.get('id'),
-                "name": r.get('name'),
-                "email": r.get('email'),
-                "phone": r.get('phone'),
-                "role": r.get('role'),
-                "permissions": parsed
-            })
-
         return jsonify(users)
 
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
 
 # ------------------------------
-# Login with JWT Token
+# Add/Update Permissions
+# ------------------------------
+@app.route('/api/permissions', methods=['POST'])
+def add_permissions():
+    data = request.json
+    user_id = data.get('user_id')
+    permissions = data.get('permissions', [])
+
+    if not user_id or not isinstance(permissions, list):
+        return jsonify({'success': False, 'message': 'Invalid data'}), 400
+
+    try:
+        save_permissions(user_id, permissions)
+        return jsonify({'success': True, 'message': 'Permissions saved'}), 201
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# ------------------------------
+# Login with JWT
 # ------------------------------
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -122,25 +159,27 @@ def login():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Step 1: Find the user
-    cursor.execute("SELECT * FROM users WHERE email=%s AND password=%s", (data['email'], data['password']))
+    cursor.execute(
+        "SELECT * FROM users WHERE email=%s AND password=%s",
+        (data['email'], data['password'])
+    )
     user = cursor.fetchone()
 
     if not user:
         conn.close()
         return jsonify({"success": False, "message": "Invalid credentials"}), 401
 
-    # Step 2: Fetch permissions for that user
-    cursor.execute("SELECT permission_name FROM permissions WHERE user_id=%s", (user['id'],))
-    permissions = [row['permission_name'] for row in cursor.fetchall()]
+    cursor.execute("SELECT permissions FROM permissions WHERE user_id=%s", (user['id'],))
+    row = cursor.fetchone()
+    permissions = json.loads(row['permissions']) if row else []
 
     conn.close()
 
-    # Step 3: Create token
     payload = {
         'user_id': user['id'],
         'email': user['email'],
         'role': user['role'],
+        'permissions': permissions,
         'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=12)
     }
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
@@ -153,7 +192,7 @@ def login():
         'email': user['email'],
         'permissions': permissions
     })
-        
+
 # ------------------------------
 # Forgot Password
 # ------------------------------
@@ -161,7 +200,6 @@ def login():
 def forgot_password():
     data = request.json
     email = data.get('email')
-
     if not email:
         return jsonify({'message': 'Email is required'}), 400
 
@@ -207,7 +245,7 @@ def reset_password():
     return jsonify({'message': 'Password reset successful.'})
 
 # ------------------------------
-# Run the App
+# Run App
 # ------------------------------
 if __name__ == '__main__':
     app.run(debug=True)
