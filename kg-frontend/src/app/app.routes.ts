@@ -7,21 +7,23 @@ import { CreateNewUser } from './components/create-new-user/create-new-user';
 import { PermissionGuard } from './permission-guard';
 import { Settings } from './components/settings/settings';
 import { UserDetails } from './components/user-details/user-details';
+import { NewEmployee } from './components/new-employee/new-employee';
 
 export const routes: Routes = [
     { path: 'login', component: Login },
     { path: 'forgot-password', component: ForgotPassword },
     { path: 'reset-password', component: ResetPassword },
+    {
+        path: 'user/:id',          // user detail page
+        component: UserDetails,
+        // canActivate: [PermissionGuard]
+    },
 
     {
         path: ':role-dashboard',
         component: Dashboard,
         children: [
-            {
-                path: 'user/:id',          // user detail page
-                component: UserDetails,
-                canActivate: [PermissionGuard]
-            },
+
             {
                 path: 'create-new-user',   // create user page
                 component: CreateNewUser,
@@ -33,6 +35,12 @@ export const routes: Routes = [
                 component: Settings,
                 canActivate: [PermissionGuard],
                 data: { permission: 'view_settings' }
+            },
+            {
+                path: 'new-employee',
+                component: NewEmployee,
+                canActivate: [PermissionGuard],
+                data: { permission: 'view_new_employee' }
             }
             // {
             //     path: '',                  // default child route
