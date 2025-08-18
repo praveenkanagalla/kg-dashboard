@@ -6,7 +6,6 @@ import mysql.connector
 import json
 import jwt
 import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
 
 # ------------------------------
 # Flask Setup
@@ -61,78 +60,6 @@ def save_permissions(user_id, permissions_list):
     conn.close()
 
 # ------------------------------
-# Create New User
-# ------------------------------
-@app.route('/api/users', methods=['POST'])
-def create_user():
-    data = request.json or {}
-    name = data.get('name')
-    email = data.get('email')
-    password = data.get('password')
-    phone = data.get('phone', '')
-    role = data.get('role', '')
-    blood_group = data.get('blood_group', '')
-    address = data.get('address', '')
-    permissions = data.get('permissions', [])  # optional permissions array
-
-    if not (name and email and password and blood_group):
-        return jsonify({"error": "name, email, password and blood_group are required"}), 400
-
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO users (name, email, password, phone, role, blood_group, address)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (name, email, password, phone, role, blood_group, address))
-        conn.commit()
-        inserted_id = cursor.lastrowid
-        cursor.close()
-        conn.close()
-
-        # Save permissions if provided
-        if permissions:
-            save_permissions(inserted_id, permissions)
-
-        return jsonify({
-            "id": inserted_id,
-            "name": name,
-            "email": email,
-            "phone": phone,
-            "role": role,
-            "blood_group": blood_group,
-            "address": address,
-            "permissions": permissions
-        }), 201
-
-    except mysql.connector.Error as err:
-        return jsonify({"error": str(err)}), 400
-
-# ------------------------------
-# Get Users
-# ------------------------------
-@app.route('/get_users', methods=['GET'])
-def get_users():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-
-        cursor.execute("SELECT id, name, email, phone, role, blood_group, address FROM users ORDER BY id DESC")
-        users = cursor.fetchall()
-
-        for user in users:
-            cursor.execute("SELECT permissions FROM permissions WHERE user_id=%s", (user['id'],))
-            row = cursor.fetchone()
-            user['permissions'] = json.loads(row['permissions']) if row else []
-
-        cursor.close()
-        conn.close()
-        return jsonify(users)
-
-    except mysql.connector.Error as err:
-        return jsonify({"error": str(err)}), 500
-
-# ------------------------------
 # Add/Update Permissions
 # ------------------------------
 @app.route('/api/permissions', methods=['POST'])
@@ -152,9 +79,89 @@ def add_permissions():
     
 
 # ------------------------------
-# Get All Users
+# Create New User
 # ------------------------------
-@app.route('/get_users', methods=['GET'], endpoint='get_users_list')
+@app.route('/api/users', methods=['POST'])
+def create_user():
+    data = request.get_json(silent=True)
+    print("Payload received:", data)
+    if not isinstance(data, dict):
+        return jsonify({"error": "Invalid JSON payload"}), 400
+
+    # Collect basic fields
+    name = data.get('name')
+    phone = data.get('phone')
+    department = data.get('department')
+    pan = data.get('pan')
+    address = data.get('address')
+    country = data.get('country')
+    state = data.get('state')
+    city = data.get('city')
+    zip_code = data.get('zip')
+    bank_name = data.get('bank_name')
+    branch_name = data.get('branch_name')
+    account_no = data.get('account_no')
+    ifsc_code = data.get('ifsc_code')
+    account_holder = data.get('account_holder')
+    working_branch = data.get('working_branch')
+    wages = data.get('wages')
+
+    # Optional authentication fields
+    email = data.get('email')
+    password = data.get('password')  # plain password
+    role = data.get('role')
+    permissions = data.get('permissions', [])
+
+    # Validate auth fields if any provided
+    if email or password or role:
+        if not all([email, password, role]):
+            return jsonify({"error": "Email, password, and role are required if adding authentication"}), 400
+    else:
+        email = None
+        password = None
+        role = None
+        permissions = []
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO users
+            (name, phone, department, pan, address, country, state, city, zip,
+             bank_name, branch_name, account_no, ifsc_code, account_holder, 
+             working_branch, wages, email, password, role)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,
+                    %s, %s, %s, %s, %s,
+                    %s, %s, %s, %s, %s)
+        """, (
+            name, phone, department, pan, address, country, state, city, zip_code,
+            bank_name, branch_name, account_no, ifsc_code, account_holder,
+            working_branch, wages, email, password, role
+        ))
+        conn.commit()
+        inserted_id = cursor.lastrowid
+        cursor.close()
+        conn.close()
+
+        # Save permissions if provided
+        if permissions:
+            save_permissions(inserted_id, permissions)
+
+        return jsonify({
+            "id": inserted_id,
+            "name": name,
+            "email": email,
+            "role": role,
+            "permissions": permissions
+        }), 201
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 400
+
+# ------------------------------
+# Get Users
+# ------------------------------
+@app.route('/get_users', methods=['GET'])
 def get_users():
     try:
         conn = get_db_connection()
@@ -173,7 +180,6 @@ def get_users():
 
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
-
 
 # ------------------------------
 # Get Single User
@@ -204,9 +210,8 @@ def get_user(user_id):
     except mysql.connector.Error as err:
         return jsonify({"error": str(err)}), 500
 
-
 # ------------------------------
-# Login with JWT
+# Login with JWT (plain password)
 # ------------------------------
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -243,17 +248,15 @@ def login():
     }
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
 
-    # Return JSON including userId for Angular localStorage
     return jsonify({
         'success': True,
         'token': token,
-        'userId': user['id'],        # <-- added this line
+        'userId': user['id'],
         'role': user['role'],
         'name': user['name'],
         'email': user['email'],
         'permissions': permissions
     })
-
 
 # ------------------------------
 # Forgot Password
@@ -284,7 +287,7 @@ def forgot_password():
     return jsonify({'message': 'Reset email sent successfully'})
 
 # ------------------------------
-# Reset Password
+# Reset Password (plain)
 # ------------------------------
 @app.route('/api/reset-password', methods=['POST'])
 def reset_password():
@@ -299,8 +302,7 @@ def reset_password():
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    password = generate_password_hash(new_password)
-    cursor.execute("UPDATE users SET password=%s WHERE email=%s", (password, email))
+    cursor.execute("UPDATE users SET password=%s WHERE email=%s", (new_password, email))
     conn.commit()
     conn.close()
 

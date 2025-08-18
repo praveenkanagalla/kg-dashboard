@@ -101,12 +101,7 @@ export class AuthService {
 
   // ===== Dashboard Routing by Role =====
   getRoleDashboard(): string {
-    const role = this.getRole().toLowerCase();
-    const map: { [key: string]: string } = {
-      admin: 'admin-dashboard',
-      manager: 'manager-dashboard',
-      user: 'user-dashboard'
-    };
-    return map[role] || 'default-dashboard';
+    const role = this.getRole();
+    return role ? `${role}-dashboard` : '';
   }
 }

@@ -7,6 +7,7 @@ import { CreateNewUser } from './components/create-new-user/create-new-user';
 import { PermissionGuard } from './permission-guard';
 import { Settings } from './components/settings/settings';
 import { UserDetails } from './components/user-details/user-details';
+import { NewEmployee } from './components/new-employee/new-employee';
 
 export const routes: Routes = [
     { path: 'login', component: Login },
@@ -27,6 +28,12 @@ export const routes: Routes = [
                 component: CreateNewUser,
                 canActivate: [PermissionGuard],
                 data: { permission: 'view_create_new_user' }
+            },
+            {
+                path: 'new-employee',
+                component: NewEmployee,
+                canActivate: [PermissionGuard],
+                data: { permission: 'view_new_employee' }
             },
             {
                 path: 'settings',          // settings page

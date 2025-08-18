@@ -23,6 +23,7 @@ export class Sidebar implements OnInit {
 
   allPermissions = [
     { name: 'Create User', route: 'view_create_new_user' },
+    { name: 'Create New Employee', route: 'view_new_employee' },
     { name: 'Settings', route: 'view_settings' }
   ];
 
@@ -81,6 +82,10 @@ export class Sidebar implements OnInit {
 
   getCreateUserLink(): string[] {
     return ['/', this.auth.getRoleDashboard(), 'create-new-user'];
+  }
+
+  getNEwEmployeeLink(): string[] {
+    return ['/', this.auth.getRoleDashboard(), 'new-employee'];
   }
 
   getSettingsLink(): string[] {

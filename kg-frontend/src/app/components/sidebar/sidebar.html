@@ -5,6 +5,10 @@
                 routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Create New User</a>
         </li>
         <li>
+            <a *ngIf="auth.hasPermission('view_create_new_user')" [routerLink]="getNEwEmployeeLink()"
+                routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Create New Employee</a>
+        </li>
+        <li>
             <a *ngIf="auth.hasPermission('view_settings')" [routerLink]="getSettingsLink()"
                 routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Settings</a>
         </li>
