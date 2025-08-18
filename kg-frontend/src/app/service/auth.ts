@@ -44,6 +44,7 @@ export class AuthService {
     localStorage.setItem('name', res.name);
     localStorage.setItem('email', res.email);
     this.setPermissions(res.permissions || []);
+    localStorage.setItem('permissions', JSON.stringify(res.permissions));
     localStorage.setItem('userId', res.userId.toString());
     localStorage.setItem('user', JSON.stringify(res));
   }
@@ -100,7 +101,12 @@ export class AuthService {
 
   // ===== Dashboard Routing by Role =====
   getRoleDashboard(): string {
-    const role = this.getRole();
-    return role ? `${role}-dashboard` : '';
+    const role = this.getRole().toLowerCase();
+    const map: { [key: string]: string } = {
+      admin: 'admin-dashboard',
+      manager: 'manager-dashboard',
+      user: 'user-dashboard'
+    };
+    return map[role] || 'default-dashboard';
   }
 }

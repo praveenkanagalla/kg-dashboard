@@ -23,7 +23,6 @@ export class Sidebar implements OnInit {
 
   allPermissions = [
     { name: 'Create User', route: 'view_create_new_user' },
-    { name: 'Create New Employee', route: 'view_new_employee' },
     { name: 'Settings', route: 'view_settings' }
   ];
 
@@ -50,29 +49,29 @@ export class Sidebar implements OnInit {
   }
 
   loadUsers() {
-    // this.loading = true;
-    // this.error = '';
+    this.loading = true;
+    this.error = '';
 
-    // this.http.get<any[]>(`${environment.apiUrl}/get_users`).subscribe({
-    //   next: (data) => {
-    //     this.users = (data || []).map(user => {
-    //       const isAdmin = user.role?.toLowerCase() === 'admin';
-    //       return {
-    //         ...user,
-    //         permissions: isAdmin
-    //           ? this.allPermissions.map(p => p.route)
-    //           : Array.isArray(user.permissions)
-    //             ? Array.from(new Set(user.permissions))
-    //             : []
-    //       };
-    //     });
-    //     this.loading = false;
-    //   },
-    //   error: (err) => {
-    //     this.error = 'Failed to fetch users: ' + (err.message || err);
-    //     this.loading = false;
-    //   }
-    // });
+    this.http.get<any[]>(`${environment.apiUrl}/get_users`).subscribe({
+      next: (data) => {
+        this.users = (data || []).map(user => {
+          const isAdmin = user.role?.toLowerCase() === 'admin';
+          return {
+            ...user,
+            permissions: isAdmin
+              ? this.allPermissions.map(p => p.route)
+              : Array.isArray(user.permissions)
+                ? Array.from(new Set(user.permissions))
+                : []
+          };
+        });
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to fetch users: ' + (err.message || err);
+        this.loading = false;
+      }
+    });
   }
 
   hasPermission(permission: string): boolean {
@@ -82,10 +81,6 @@ export class Sidebar implements OnInit {
 
   getCreateUserLink(): string[] {
     return ['/', this.auth.getRoleDashboard(), 'create-new-user'];
-  }
-
-  getNEwEmployeeLink(): string[] {
-    return ['/', this.auth.getRoleDashboard(), 'new-employee'];
   }
 
   getSettingsLink(): string[] {

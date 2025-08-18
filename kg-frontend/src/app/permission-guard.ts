@@ -8,9 +8,9 @@ export class PermissionGuard implements CanActivate {
   constructor(private auth: AuthService, private router: Router) { }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    // ===== 1. Check role matches the dashboard =====
-    const roleDashboard = route.parent?.params['role-dashboard']; // e.g. 'admin-dashboard'
-    const userRoleDashboard = this.auth.getRoleDashboard();     // e.g. 'admin-dashboard'
+    // ===== 1. Check role matches the URL =====
+    const roleDashboard = route.parent?.params['role-dashboard']; // e.g. "admin-dashboard"
+    const userRoleDashboard = this.auth.getRoleDashboard(); // e.g. "admin-dashboard"
 
     if (roleDashboard && roleDashboard !== userRoleDashboard) {
       this.router.navigate(['/login']);
@@ -24,18 +24,15 @@ export class PermissionGuard implements CanActivate {
     if (!requiredPermission) {
       const routePath = route.routeConfig?.path || '';
       const permissionMap: { [key: string]: string } = {
-        'create-new-user': 'create new employee',
-        'new-employee': 'create new employee',
-        'settings': 'settings'
+        'create-new-user': 'view_create_new_user',
+        'settings': 'view_settings'
       };
       requiredPermission = permissionMap[routePath];
     }
 
-    // ===== 3. Check if user has permission =====
-    const userPermissions = this.auth.getPermissions() || []; // should return string[]
-    if (requiredPermission && !userPermissions.includes(requiredPermission.toLowerCase())) {
-      // Redirect back to dashboard
-      this.router.navigate([`/${userRoleDashboard}`]);
+    // ===== 3. If permission required, check it =====
+    if (requiredPermission && !this.auth.hasPermission(requiredPermission)) {
+      this.router.navigate([`/${userRoleDashboard}`]); // back to dashboard
       return false;
     }
 
