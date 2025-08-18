@@ -1,0 +1,60 @@
+/* Dark background behind modal */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    /* semi-transparent */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    /* make sure it’s above other content */
+}
+
+/* Modal box */
+.modal {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: fadeInScale 0.3s ease-in-out;
+}
+
+/* Close button (top-right corner) */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ff4d4d;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.close-btn:hover {
+    background: #e60000;
+}
+
+/* Animation */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

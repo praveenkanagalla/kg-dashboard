@@ -166,20 +166,14 @@ def get_users():
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT id, name, email, phone, role, blood_group, address FROM users ORDER BY id DESC")
+        cursor.execute("SELECT * FROM users")
         users = cursor.fetchall()
-
-        for user in users:
-            cursor.execute("SELECT permissions FROM permissions WHERE user_id=%s", (user['id'],))
-            row = cursor.fetchone()
-            user['permissions'] = json.loads(row['permissions']) if row else []
-
         cursor.close()
         conn.close()
         return jsonify(users)
-
-    except mysql.connector.Error as err:
-        return jsonify({"error": str(err)}), 500
+    except Exception as e:
+        print("Error fetching users:", e)
+        return jsonify({"error": "Failed to fetch users"}), 500
 
 # ------------------------------
 # Get Single User
@@ -189,26 +183,17 @@ def get_user(user_id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute(
-            "SELECT id, name, email, phone, role, blood_group, address FROM users WHERE id=%s",
-            (user_id,)
-        )
+        cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
         user = cursor.fetchone()
-        if not user:
-            cursor.close()
-            conn.close()
-            return jsonify({"error": "User not found"}), 404
-
-        cursor.execute("SELECT permissions FROM permissions WHERE user_id=%s", (user_id,))
-        row = cursor.fetchone()
-        user['permissions'] = json.loads(row['permissions']) if row else []
-
         cursor.close()
         conn.close()
-        return jsonify(user)
-
-    except mysql.connector.Error as err:
-        return jsonify({"error": str(err)}), 500
+        if user:
+            return jsonify(user)
+        else:
+            return jsonify({"error": "User not found"}), 404
+    except Exception as e:
+        print("Error fetching user:", e)
+        return jsonify({"error": "Failed to fetch user"}), 500
 
 # ------------------------------
 # Login with JWT (plain password)

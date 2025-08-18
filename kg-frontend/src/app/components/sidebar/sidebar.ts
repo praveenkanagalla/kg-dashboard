@@ -91,4 +91,8 @@ export class Sidebar implements OnInit {
   getSettingsLink(): string[] {
     return ['/', this.auth.getRoleDashboard(), 'settings'];
   }
+
+  openAllUsersModal(): void {
+    console.log("Hello....");
+  }
 }

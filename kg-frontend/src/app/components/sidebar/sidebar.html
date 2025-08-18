@@ -12,5 +12,11 @@
             <a *ngIf="auth.hasPermission('view_settings')" [routerLink]="getSettingsLink()"
                 routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Settings</a>
         </li>
+        <li>
+            <!-- Admin-only All Users button -->
+            <div *ngIf="role === 'admin'">
+                <button class="all-users-btn" (click)="openAllUsersModal()">All Users</button>
+            </div>
+        </li>
     </ul>
 </div>

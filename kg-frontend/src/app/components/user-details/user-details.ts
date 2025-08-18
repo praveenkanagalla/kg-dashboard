@@ -1,42 +1,78 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+
+interface User {
+  id: number;
+  name: string;
+  email?: string;
+  role?: string;
+  phone?: string;
+  permissions?: string[]; // JSON array of permissions
+}
 
 @Component({
   selector: 'app-user-details',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './user-details.html',
-  styleUrl: './user-details.css'
+  styleUrls: ['./user-details.css']
 })
 export class UserDetails implements OnInit {
-  userId!: number;
-  user: any;
-  loading = true;
-  error: string | null = null;
 
-  constructor(private route: ActivatedRoute, private http: HttpClient) { }
+  currentUser: User | null = null;       // Current logged-in user
+  allPermissions: string[] = [];         // All permissions (for admin)
+  loadingUser = false;
+  errorUser: string | null = null;
+
+  constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
-    this.userId = Number(this.route.snapshot.paramMap.get('id'));
-    this.http.get(`http://localhost:5000/api/users/${this.userId}`)
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      const userId = user.userId || user.id;
+
+      if (userId) {
+        this.fetchUserWithPermissions(userId, user.role);
+      }
+    }
+  }
+
+  // Fetch current user and optionally all permissions if admin
+  fetchUserWithPermissions(userId: number, role?: string): void {
+    this.loadingUser = true;
+
+    this.http.get<User>(`http://localhost:5000/api/users/${userId}`)
       .subscribe({
-        next: (data) => this.user = data,
-        error: () => console.error('User not found')
+        next: (res) => {
+          this.currentUser = res;
+
+          // If admin, fetch all permissions
+          if (role === 'admin') {
+            this.fetchAllPermissions();
+          }
+
+          this.loadingUser = false;
+        },
+        error: (err) => {
+          console.error('Failed to load user details', err);
+          this.errorUser = 'Failed to load user details';
+          this.loadingUser = false;
+        }
       });
   }
 
-  getUserDetails(): void {
-    this.http.get(`http://localhost:5000/api/users/${this.userId}`)
+  // Fetch all permissions for admin
+  fetchAllPermissions(): void {
+    this.http.get<string[]>(`http://localhost:5000/api/permissions`)
       .subscribe({
-        next: (data) => {
-          this.user = data;
-          this.loading = false;
+        next: (res) => {
+          this.allPermissions = res;
         },
-        error: () => {
-          this.error = 'Failed to load user details';
-          this.loading = false;
+        error: (err) => {
+          console.error('Failed to load all permissions', err);
+          this.allPermissions = [];
         }
       });
   }

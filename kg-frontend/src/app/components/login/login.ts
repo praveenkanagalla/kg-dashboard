@@ -23,10 +23,6 @@ export class Login {
     this.auth.login({ email: this.email, password: this.password }).subscribe({
       next: (res: any) => {
         this.auth.saveUserData(res);
-
-        console.log('Logged in user permissions:', res.permissions);
-        console.log('Permissions from localStorage:', JSON.parse(localStorage.getItem('permissions') || '[]'));
-
         // Redirect based on role
         this.router.navigate([`/${res.role}-dashboard`]);
       },

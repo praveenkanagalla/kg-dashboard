@@ -1,12 +1,19 @@
-<div *ngIf="loading">Loading user details...</div>
-<div *ngIf="error" class="error">{{ error }}</div>
+<!-- Loading indicator -->
+<div *ngIf="loadingUser">Loading user details...</div>
 
-<div *ngIf="user && !loading">
+<!-- Error message -->
+<div *ngIf="errorUser" class="error">{{ errorUser }}</div>
+
+<!-- User details -->
+<div *ngIf="currentUser && !loadingUser">
     <h2>User Details</h2>
-    <p><strong>ID:</strong> {{ user.id }}</p>
-    <p><strong>Name:</strong> {{ user.name }}</p>
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>Phone:</strong> {{ user.phone }}</p>
-    <p><strong>Role:</strong> {{ user.role }}</p>
-    <p><strong>Permissions:</strong> {{ user.permissions }}</p>
+    <p><strong>ID:</strong> {{ currentUser.id }}</p>
+    <p><strong>Name:</strong> {{ currentUser.name }}</p>
+    <p><strong>Email:</strong> {{ currentUser.email || 'N/A' }}</p>
+    <p><strong>Phone:</strong> {{ currentUser.phone || 'N/A' }}</p>
+    <p><strong>Role:</strong> {{ currentUser.role || 'N/A' }}</p>
+    <p><strong>Permissions:</strong>
+        {{ currentUser.permissions && currentUser.permissions.length ? currentUser.permissions.join(', ') : 'No
+        permissions' }}
+    </p>
 </div>

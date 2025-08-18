@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { Sidebar } from '../../components/sidebar/sidebar';
 import { HttpClient } from '@angular/common/http';
+import { Modal } from '../../components/modal/modal';
+import { UserDetails } from '../../components/user-details/user-details';
 
 interface User {
   userId: number;   // matches backend
@@ -17,7 +19,7 @@ interface User {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterModule, Sidebar, CommonModule],
+  imports: [RouterModule, Sidebar, CommonModule, Modal, UserDetails],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css'],
 })
@@ -28,7 +30,8 @@ export class Dashboard implements OnInit {
   user: User | null = null;
   userId: number | null = null;
 
-  constructor(private route: ActivatedRoute, private http: HttpClient) { }
+  constructor(private route: ActivatedRoute, private router: Router, private http: HttpClient) { }
+
 
   ngOnInit(): void {
     // 1️⃣ Set page title from route
@@ -48,29 +51,21 @@ export class Dashboard implements OnInit {
       this.user = JSON.parse(storedUser);
       this.userId = this.user?.userId || null; // ✅ safe access
     }
-
-    // 4️⃣ Fetch full user info from backend if userId exists
-    const storedUserId = localStorage.getItem('userId');
-    if (storedUserId) {
-      const userIdNum = Number(storedUserId);
-      this.http.get<User>(`http://localhost:5000/api/users/${userIdNum}`)
-        .subscribe({
-          next: (userData: User) => {
-            this.user = userData;
-            this.userId = userData.userId;  // ensure userId is set
-            this.userName = this.user.name;
-            this.role = this.user.role || '';
-          },
-          error: () => {
-            console.error("Failed to load user details from backend");
-          }
-        });
-    }
   }
 
   capitalize(word: string): string {
     return word.charAt(0).toUpperCase() + word.slice(1);
   }
+
+  showModal = false;   // stays false at start
+
+  openModal() {
+    this.showModal = true;
+  }
+  closeModal() {
+    this.showModal = false;
+  }
+
 
   logout(): void {
     localStorage.clear();
