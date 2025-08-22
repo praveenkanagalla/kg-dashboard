@@ -9,6 +9,7 @@ import { Settings } from './components/settings/settings';
 import { UserDetails } from './components/user-details/user-details';
 import { NewEmployee } from './components/new-employee/new-employee';
 import { AuthGuard } from './guards/auth-guard';
+import { AllUsers } from './components/all-users/all-users';
 
 export const routes: Routes = [
     { path: 'login', component: Login },
@@ -36,6 +37,16 @@ export const routes: Routes = [
                 component: NewEmployee,
                 canActivate: [PermissionGuard],
                 data: { permission: 'view_new_employee' }
+            },
+            // {
+            //     path: '/employee/:id',
+            //     component: NewEmployee,
+            //     canActivate: [PermissionGuard],
+            //     data: { permission: 'view_new_employee' }
+            // },
+            {
+                path: 'all-users',
+                component: AllUsers,
             },
             {
                 path: 'settings',          // settings page

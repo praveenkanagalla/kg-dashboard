@@ -194,6 +194,53 @@ def get_user(user_id):
     except Exception as e:
         print("Error fetching user:", e)
         return jsonify({"error": "Failed to fetch user"}), 500
+    
+@app.route('/update_user/<int:user_id>', methods=['PUT'])
+def update_user(user_id):
+    try:
+        data = request.json
+        print("📌 Incoming data:", data)   # Debug print
+
+        name = data.get("name")
+        email = data.get("email")
+        role = data.get("role")
+        phone = data.get("phone")
+        permissions = data.get("permissions", [])
+
+        print("📌 Permissions before processing:", permissions)
+
+        if isinstance(permissions, str):
+            permissions = [p.strip() for p in permissions.split(",") if p.strip()]
+
+        permissions_str = ",".join(permissions)
+        print("📌 Permissions final string:", permissions_str)
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        query = """
+            UPDATE users 
+            SET name=%s, email=%s, role=%s, phone=%s, permissions=%s 
+            WHERE id=%s
+        """
+        cursor.execute(query, (name, email, role, phone, permissions_str, user_id))
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            return jsonify({"error": "User not found"}), 404
+
+        return jsonify({"message": "User updated successfully"}), 200
+
+    except Exception as e:
+        print("❌ ERROR:", str(e))   # Log actual error
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 
 # ------------------------------
 # Login with JWT (plain password)

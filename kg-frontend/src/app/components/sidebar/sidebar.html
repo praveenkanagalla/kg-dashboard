@@ -1,22 +1,22 @@
 <div class="sidebar">
     <ul>
         <li>
-            <a *ngIf="auth.hasPermission('view_create_new_user')" [routerLink]="getCreateUserLink()"
+            <a class="sidebar-nav" *ngIf="auth.hasPermission('view_create_new_user')" [routerLink]="getCreateUserLink()"
                 routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Create New User</a>
         </li>
         <li>
-            <a *ngIf="auth.hasPermission('view_create_new_user')" [routerLink]="getNEwEmployeeLink()"
-                routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Create New Employee</a>
+            <a class="sidebar-nav" *ngIf="auth.hasPermission('view_create_new_user')"
+                [routerLink]="getNEwEmployeeLink()" routerLinkActive="active-link"
+                [routerLinkActiveOptions]="{ exact: true }">Create New Employee</a>
         </li>
         <li>
-            <a *ngIf="auth.hasPermission('view_settings')" [routerLink]="getSettingsLink()"
+            <a class="sidebar-nav" *ngIf="auth.hasPermission('view_settings')" [routerLink]="getSettingsLink()"
                 routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Settings</a>
         </li>
-        <li>
-            <!-- Admin-only All Users button -->
-            <div *ngIf="role === 'admin'">
-                <button class="all-users-btn" (click)="openAllUsersModal()">All Users</button>
-            </div>
+        <!-- Admin-only All Users button -->
+        <li *ngIf="role === 'Admin'">
+            <a routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }" class="sidebar-nav"
+                class="all-users-btn" (click)="openAllUsers()">All Users</a>
         </li>
     </ul>
 </div>

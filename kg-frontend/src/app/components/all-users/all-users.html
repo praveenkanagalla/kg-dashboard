@@ -1,0 +1,92 @@
+<div class="users-container">
+    <h2>All Users</h2>
+
+    <!-- Search bar -->
+    <input type="text" placeholder="Search by name, email or role..." [(ngModel)]="searchTerm" (input)="filterUsers()"
+        class="search-box" />
+
+    <div *ngIf="loading" class="loading">Loading users...</div>
+    <div *ngIf="error" class="error">{{ error }}</div>
+
+    <div class="table-container" *ngIf="filteredUsers.length && !loading; else noUsers">
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Phone</th>
+                    <th>Permissions</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of filteredUsers">
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email || 'N/A' }}</td>
+                    <td>{{ user.role || 'N/A' }}</td>
+                    <td>{{ user.phone || 'N/A' }}</td>
+                    <td>{{ user.permissions?.join(', ') || 'No permissions' }}</td>
+                    <td>
+                        <button class="view-btn" (click)="openModalView(user)">View</button>
+                        <button class="edit-btn" (click)="openModalEdit(user)">Edit</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <ng-template #noUsers>
+        <p class="no-users-msg">No users found.</p>
+    </ng-template>
+
+    <!-- VIEW Modal -->
+    <div class="modal-backdrop" *ngIf="showModalView">
+        <div class="modal">
+            <h3>User Details</h3>
+            <p><strong>ID:</strong> {{ selectedUser?.id }}</p>
+            <p><strong>Name:</strong> {{ selectedUser?.name }}</p>
+            <p><strong>Email:</strong> {{ selectedUser?.email || 'N/A' }}</p>
+            <p><strong>Role:</strong> {{ selectedUser?.role || 'N/A' }}</p>
+            <p><strong>Phone:</strong> {{ selectedUser?.phone || 'N/A' }}</p>
+            <p><strong>Permissions:</strong> {{ selectedUser?.permissions?.join(', ') || 'No permissions' }}</p>
+
+            <button (click)="closeModalView()">Close</button>
+        </div>
+    </div>
+
+    <!-- EDIT Modal -->
+    <div class="modal-edit-form" *ngIf="showModalEdit">
+        <div class="modal">
+            <h3>Edit User</h3>
+
+            <form (ngSubmit)="updateUser()" class="edit-form">
+                <label>Name:</label>
+                <input [(ngModel)]="editUserData.name" name="name" required />
+
+                <label>Email:</label>
+                <input [(ngModel)]="editUserData.email" name="email" />
+
+                <label>Role:</label>
+                <select [(ngModel)]="editUserData.role" name="role">
+                    <option value="admin">Admin</option>
+                    <option value="manager">Manager</option>
+                    <option value="employee">Employee</option>
+                </select>
+
+                <label>Phone:</label>
+                <input [(ngModel)]="editUserData.phone" name="phone" />
+
+                <label>Permissions (comma separated):</label>
+                <input [(ngModel)]="permissionsInput" name="permissions" />
+
+                <div class="modal-actions">
+                    <button type="submit">Update</button>
+                    <button type="button" (click)="closeModalEdit()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

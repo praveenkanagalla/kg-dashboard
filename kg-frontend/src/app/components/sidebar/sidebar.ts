@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
@@ -27,7 +27,7 @@ export class Sidebar implements OnInit {
     { name: 'Settings', route: 'view_settings' }
   ];
 
-  constructor(private http: HttpClient, public auth: AuthService) { }
+  constructor(private http: HttpClient, public auth: AuthService, private router: Router) { }
 
   ngOnInit(): void {
     this.setRoleFromToken();
@@ -92,7 +92,8 @@ export class Sidebar implements OnInit {
     return ['/', this.auth.getRoleDashboard(), 'settings'];
   }
 
-  openAllUsersModal(): void {
-    console.log("Hello....");
+  openAllUsers(): void {
+    this.router.navigate(['/', this.auth.getRoleDashboard(), 'all-users']);
   }
+
 }

@@ -8,7 +8,6 @@ interface User {
   email?: string;
   role?: string;
   phone?: string;
-  permissions?: string[]; // JSON array of permissions
 }
 
 @Component({
@@ -21,7 +20,6 @@ interface User {
 export class UserDetails implements OnInit {
 
   currentUser: User | null = null;       // Current logged-in user
-  allPermissions: string[] = [];         // All permissions (for admin)
   loadingUser = false;
   errorUser: string | null = null;
 
@@ -47,32 +45,12 @@ export class UserDetails implements OnInit {
       .subscribe({
         next: (res) => {
           this.currentUser = res;
-
-          // If admin, fetch all permissions
-          if (role === 'admin') {
-            this.fetchAllPermissions();
-          }
-
           this.loadingUser = false;
         },
         error: (err) => {
           console.error('Failed to load user details', err);
           this.errorUser = 'Failed to load user details';
           this.loadingUser = false;
-        }
-      });
-  }
-
-  // Fetch all permissions for admin
-  fetchAllPermissions(): void {
-    this.http.get<string[]>(`http://localhost:5000/api/permissions`)
-      .subscribe({
-        next: (res) => {
-          this.allPermissions = res;
-        },
-        error: (err) => {
-          console.error('Failed to load all permissions', err);
-          this.allPermissions = [];
         }
       });
   }
