@@ -1,22 +1,52 @@
 <div class="sidebar">
-    <ul>
+    <ul class="sidebar-content">
         <li>
             <a class="sidebar-nav" *ngIf="auth.hasPermission('view_create_new_user')" [routerLink]="getCreateUserLink()"
-                routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Create New User</a>
+                routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
+                Create New User
+            </a>
         </li>
+
         <li>
             <a class="sidebar-nav" *ngIf="auth.hasPermission('view_create_new_user')"
                 [routerLink]="getNEwEmployeeLink()" routerLinkActive="active-link"
-                [routerLinkActiveOptions]="{ exact: true }">Create New Employee</a>
+                [routerLinkActiveOptions]="{ exact: true }">
+                Create New Employee
+            </a>
         </li>
+
         <li>
             <a class="sidebar-nav" *ngIf="auth.hasPermission('view_settings')" [routerLink]="getSettingsLink()"
-                routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Settings</a>
+                routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
+                Settings
+            </a>
         </li>
+
         <!-- Admin-only All Users button -->
         <li *ngIf="role === 'Admin'">
-            <a routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }" class="sidebar-nav"
-                class="all-users-btn" (click)="openAllUsers()">All Users</a>
+            <a routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }"
+                class="sidebar-nav all-users-btn" (click)="openAllUsers()">
+                All Users
+            </a>
+        </li>
+
+        <!-- Dropdown for Stores -->
+        <li class="dropdown">
+            <a class="sidebar-nav" (click)="toggleStoreDropdown()">
+                Stores
+                <span class="arrow" [class.open]="isStoreDropdownOpen">&#9662;</span>
+            </a>
+            <ul class="dropdown-menu" *ngIf="isStoreDropdownOpen">
+                <li>
+                    <a class="sidebar-subnav" *ngIf="auth.hasPermission('view_chilkooru_report')"
+                        [routerLink]="getChilkooruReportLink()" routerLinkActive="active-link"
+                        [routerLinkActiveOptions]="{ exact: true }">
+                        Chilkooru Report
+                    </a>
+                </li>
+                <li><a class="sidebar-subnav" routerLink="/stores/kukatpally">Kukatpally Store</a></li>
+                <li><a class="sidebar-subnav" routerLink="/stores/lb-nagar">LB Nagar Store</a></li>
+            </ul>
         </li>
     </ul>
 </div>

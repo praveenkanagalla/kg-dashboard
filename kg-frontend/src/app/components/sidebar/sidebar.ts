@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -94,6 +94,26 @@ export class Sidebar implements OnInit {
 
   openAllUsers(): void {
     this.router.navigate(['/', this.auth.getRoleDashboard(), 'all-users']);
+  }
+
+  getChilkooruReportLink(): string[] {
+    return ['/', this.auth.getRoleDashboard(), 'chilkooru-report'];
+  }
+
+  // dropdown code
+  isStoreDropdownOpen = false;
+
+  toggleStoreDropdown() {
+    this.isStoreDropdownOpen = !this.isStoreDropdownOpen;
+  }
+
+  // Detect clicks outside dropdown
+  @HostListener('document:click', ['$event'])
+  handleClickOutside(event: Event) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.dropdown')) {
+      this.isStoreDropdownOpen = false;
+    }
   }
 
 }

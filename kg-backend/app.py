@@ -338,10 +338,13 @@ def reset_password():
     conn.commit()
     conn.close()
 
-    return jsonify({'message': 'Password reset successful.'})
+    return jsonify({'message': 'Password reset successful.'})   
 
 # ------------------------------
 # Run App
 # ------------------------------
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+    # Do you want me to also link the "Total (GS + OB)" row (row 6) so it automatically updates when Gross Sale + Opening Balance changes?

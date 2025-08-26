@@ -26,7 +26,8 @@ export class PermissionGuard implements CanActivate {
       const permissionMap: { [key: string]: string } = {
         'create-new-user': 'view_create_new_user',
         'new-employee': 'view_new_employee',
-        'settings': 'view_settings'
+        'settings': 'view_settings',
+        'chilkooru-report': 'view_chilkooru_report'
       };
       requiredPermission = permissionMap[routePath];
     }

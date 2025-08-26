@@ -10,13 +10,12 @@ import { UserDetails } from './components/user-details/user-details';
 import { NewEmployee } from './components/new-employee/new-employee';
 import { AuthGuard } from './guards/auth-guard';
 import { AllUsers } from './components/all-users/all-users';
+import { ChilkooruReport } from './components/chilkooru-report/chilkooru-report';
 
 export const routes: Routes = [
     { path: 'login', component: Login },
     { path: 'forgot-password', component: ForgotPassword },
     { path: 'reset-password', component: ResetPassword },
-
-
     {
         path: ':role-dashboard',
         component: Dashboard,
@@ -38,12 +37,12 @@ export const routes: Routes = [
                 canActivate: [PermissionGuard],
                 data: { permission: 'view_new_employee' }
             },
-            // {
-            //     path: '/employee/:id',
-            //     component: NewEmployee,
-            //     canActivate: [PermissionGuard],
-            //     data: { permission: 'view_new_employee' }
-            // },
+            {
+                path: 'chilkooru-report',
+                component: ChilkooruReport,
+                canActivate: [PermissionGuard],
+                data: { permission: 'view_chilkooru_report' }
+            },
             {
                 path: 'all-users',
                 component: AllUsers,
@@ -53,12 +52,8 @@ export const routes: Routes = [
                 component: Settings,
                 canActivate: [PermissionGuard],
                 data: { permission: 'view_settings' }
-            }
-            // {
-            //     path: '',                  // default child route
-            //     redirectTo: 'user/:id',    // you can change this to dashboard default
-            //     pathMatch: 'full'
-            // }
+            },
+
         ]
     },
 

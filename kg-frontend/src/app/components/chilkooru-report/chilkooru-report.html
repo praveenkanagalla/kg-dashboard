@@ -1,0 +1,238 @@
+<div class="chilkooru-report-container">
+    <div class="chilkooru-report-content-table-1">
+        <table class="excel-table chilkooru-report-table-1">
+            <!-- Header -->
+            <tr class="header-row">
+                <td colspan="3" class="branch-title">KG - CHILKUR</td>
+                <td colspan="2" class="date">{{ today | date: 'dd/MMM/yy' }}</td>
+            </tr>
+
+            <!-- Column Headers -->
+            <tr class="column-header">
+                <td>S.No</td>
+                <td>Particulars</td>
+                <td>Actual Amount</td>
+                <td>System</td>
+                <td>Difference</td>
+            </tr>
+
+            <!-- Opening Balance -->
+            <tr class="opening-balance-section">
+                <td>1</td>
+                <td>Opening Balance</td>
+                <td contenteditable="true"
+                    (input)="openingBalance = +$any($event.target).innerText || 0; updateGrossSale()">
+                    {{ openingBalance }}
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <!-- Day's Sales Report -->
+            <tr class="section-title">
+                <td colspan="5">Day's Sales Report</td>
+            </tr>
+
+            <!-- Gross Sale -->
+            <tr class="gross-sale-section">
+                <td>2</td>
+                <td>Gross Sale</td>
+
+                <!-- Actual Amount -->
+                <td (input)="grossSale.actual = +$any($event.target).innerText || 0; updateGrossSale();">
+                    {{ grossSale.actual }}
+                </td>
+
+                <!-- System Amount -->
+                <td (input)="grossSale.system = +$any($event.target).innerText || 0; updateGrossSale();">
+                    {{ grossSale.system }}
+                </td>
+
+                <!-- Difference -->
+                <td>{{ grossSale.difference }}</td>
+            </tr>
+
+
+            <tr class="swipe-machine-section">
+                <td>3</td>
+                <td>Swipe Machine</td>
+                <td contenteditable="true"
+                    (input)="swipe.actual = +$any($event.target).innerText || 0; updateGrossSale()">
+                    {{ swipe.actual }}
+                </td>
+                <td contenteditable="true"
+                    (input)="swipe.system = +$any($event.target).innerText || 0; updateGrossSale()">
+                    {{ swipe.system }}
+                </td>
+                <td>{{ swipe.difference }}</td>
+            </tr>
+
+            <tr class="upi-wallets-section">
+                <td>4</td>
+                <td>UPI Wallets</td>
+                <td contenteditable="true"
+                    (input)="upi.actual = +$any($event.target).innerText || 0; updateGrossSale()">
+                    {{ upi.actual }}
+                </td>
+                <td contenteditable="true"
+                    (input)="upi.system = +$any($event.target).innerText || 0; updateGrossSale()">
+                    {{ upi.system }}
+                </td>
+                <td>{{ upi.difference }}</td>
+            </tr>
+
+            <tr class="cash-section">
+                <td>5</td>
+                <td>Cash</td>
+                <td (input)="cash.actual = +$any($event.target).innerText || 0; updateGrossSale()">
+                    {{ getTodayCash() }}
+                </td>
+                <td contenteditable="true"
+                    (input)="cash.system = +$any($event.target).innerText || 0; updateGrossSale()">
+                    {{ cash.system }}
+                </td>
+                <td>{{ cash.difference }}</td>
+            </tr>
+
+            <tr class="total-GS-OB-section">
+                <td>6</td>
+                <td>Total (GS+OB)</td>
+                <td>{{ totalGSOB.actual }}</td>
+                <td>{{ totalGSOB.system }}</td>
+                <td>{{ totalGSOB.difference }}</td>
+            </tr>
+
+            <!-- Amount Deposit -->
+            <tr class="sub-section">
+                <td class="sub-section-title" colspan="2">Amount Deposit in Bank</td>
+                <td class="sub-section-amount" colspan="3">{{ amountDeposit }}</td>
+            </tr>
+
+            <!-- Closing Balance -->
+            <tr>
+                <td>8</td>
+                <td colspan="2">Closing Balance</td>
+                <td colspan="2" contenteditable="true"
+                    (input)="closingBalance = +$any($event.target).innerText || 0; updateDeposit()">
+                    {{ closingBalance }}
+                </td>
+            </tr>
+
+            <!-- Monthly Cumulative Sale -->
+            <tr class="monthly-title">
+                <td colspan="5">Monthly Cumulative Sale</td>
+            </tr>
+
+            <tr>
+                <td>7</td>
+                <td colspan="2">Monthly Sale</td>
+                <td colspan="2">{{ monthlySale }}</td>
+            </tr>
+        </table>
+
+        <div class="chilkooru-report-table-2">
+            <table class="excel-table">
+                <thead>
+                    <tr>
+                        <td colspan="3" class="header">Cash Denomination of the Day</td>
+                    </tr>
+                    <tr class="column-header">
+                        <td>Notes / Coin</td>
+                        <td>Quantity</td>
+                        <td>Total</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let d of denominations">
+                        <td>{{ d.note }}</td>
+                        <td contenteditable="true"
+                            (input)="d.quantity = $any($event.target).innerText.trim() ? +$any($event.target).innerText : 0; updateTotals()">
+                            {{ d.quantity }}
+                        </td>
+                        <td class="total-amount">{{ d.total }}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2" class="footer">Grand Total</td>
+                        <td>{{ getGrandTotal() }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="footer">Difference</td>
+                        <td>{{ getDifference() }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+</div>
+<div class="chilkooru-report-content-table-2">
+    <div class="instore-expenses">
+        <table class="excel-table expenses-table">
+            <thead>
+                <tr>
+                    <td colspan="3" class="header">Instore Expenses</td>
+                </tr>
+                <tr class="column-header">
+                    <td>S.No</td>
+                    <td>Daily Expense</td>
+                    <td>Amount</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let exp of expenses; let i = index">
+                    <td>{{ i + 1 }}</td>
+                    <td contenteditable="true" class="expenses-text" (input)="exp.name = $any($event.target).innerText">
+                    </td>
+                    <td contenteditable="true"
+                        (input)="exp.amount = +$any($event.target).innerText || 0; updateTotal()">
+                        {{ exp.amount }}
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2" class="footer">Total Expense of the day</td>
+                    <td>{{ totalExpense }}</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <!-- Add Row Button -->
+        <button class="add-row-btn" (click)="addRow()">+</button>
+    </div>
+
+    <div class="chilkooru-report-table-3">
+        <table class="excel-table remarks-table">
+            <thead>
+                <tr>
+                    <td colspan="3" class="remarks-header">Short &amp; Excess Amount Remarks</td>
+                </tr>
+                <tr class="column-header">
+                    <td>Particulars</td>
+                    <td>Difference</td>
+                    <td>Reason</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Swipe Machine</td>
+                    <td>{{ swipe.difference }}</td>
+                    <td class="reason-text" contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <td>UPI Wallets</td>
+                    <td>{{ upi.difference }}</td>
+                    <td class="reason-text" contenteditable="true"></td>
+                </tr>
+                <tr>
+                    <td>Cash</td>
+                    <td>{{ cash.difference + totalExpense}}</td>
+                    <td class="reason-text" contenteditable="true"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>

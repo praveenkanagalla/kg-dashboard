@@ -1,0 +1,216 @@
+.chilkooru-report-container {
+    width: 100%;
+    overflow: hidden;
+}
+
+/* chilkooru-report-content-table-1  */
+.chilkooru-report-content-table-1 {
+    display: flex;
+    align-items: flex-start;
+}
+
+.chilkooru-report-table-1 {
+    width: 70%;
+}
+
+.chilkooru-report-table-2 {
+    width: 30%;
+}
+
+.chilkooru-report-table-1,
+.chilkooru-report-table-2,
+.excel-table,
+table {
+    border-collapse: collapse;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* Common cell styles */
+.excel-table td,
+.chilkooru-report-table-2 th,
+.chilkooru-report-table-2 td,
+.chilkooru-report-table-1 td,
+th,
+td {
+    border: 1px solid #444;
+    padding: 6px;
+    height: 28px;
+}
+
+/* Editable cells */
+[contenteditable="true"] {
+    background-color: #e7e7e7 !important;
+    cursor: text;
+    outline: none;
+}
+
+[contenteditable="true"]:focus {
+    background-color: #eee;
+    border: 1px solid #3399ff;
+}
+
+/* Header Row */
+.header-row {
+    background-color: #98441a;
+    color: white;
+    font-weight: bold;
+}
+
+.branch-title {
+    text-align: center;
+    font-size: 16px;
+    text-transform: uppercase;
+}
+
+.date {
+    background-color: #eee;
+    font-weight: bold;
+    text-align: center;
+    color: #98441a;
+}
+
+/* Column Headers */
+.column-header,
+th {
+    background-color: #98441a;
+    color: white;
+    font-weight: bold;
+}
+
+/* Section Titles */
+.section-title {
+    font-weight: bold;
+    text-align: center;
+}
+
+.sub-section {
+    font-weight: bold;
+    text-align: center;
+}
+
+.sub-section-title {
+    color: #fff;
+    background-color: #98441a;
+}
+
+.monthly-title {
+    background-color: #98441a;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+}
+
+.header {
+    background: #98441a;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+td[contenteditable="true"] {
+    background: #f5f5f5;
+    outline: none;
+}
+
+.total-amount {
+    width: 100px;
+}
+
+tfoot .footer {
+    font-weight: bold;
+    background: #ddd;
+}
+
+/* .chilkooru-report-content-table-2 */
+
+.chilkooru-report-content-table-2 {
+    margin-top: 30px;
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.chilkooru-report-table-3 {
+    width: 40%;
+}
+
+.instore-expenses {
+    width: 55%;
+    text-align: center;
+}
+
+.expenses-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.expenses-table td {
+    border: 1px solid #444;
+    padding: 6px;
+    height: 28px;
+}
+
+.expenses-table .header {
+    background: #98441a;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    font-size: 16px;
+}
+
+.expenses-table .column-header td {
+    background: #98441a;
+    color: white;
+    font-weight: bold;
+}
+
+.expenses-table td[contenteditable="true"] {
+    background: #f9f9f9;
+    outline: none;
+}
+
+.expenses-table td[contenteditable="true"]:focus {
+    background: #e6f0ff;
+    border: 1px solid #3399ff;
+}
+
+.expenses-table tfoot .footer {
+    font-weight: bold;
+    background: #ddd;
+    text-align: right;
+}
+
+/* + button */
+.add-row-btn {
+    margin-top: 8px;
+    background: #98441a;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.add-row-btn:hover {
+    background: #b55325;
+}
+
+.reason-text {
+    width: 200px;
+    text-align: left;
+    display: block;
+    overflow: auto;
+}
+
+.expenses-text {
+    width: 550px;
+    text-align: left;
+    display: block;
+    overflow: auto;
+    border: 0;
+}
