@@ -3,6 +3,17 @@
     overflow: hidden;
 }
 
+.submitReport-btn {
+    background-color: #b55325;
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
 /* chilkooru-report-content-table-1  */
 .chilkooru-report-content-table-1 {
     display: flex;

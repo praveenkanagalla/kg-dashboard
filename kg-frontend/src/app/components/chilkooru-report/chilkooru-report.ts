@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { DatePipe, CommonModule } from '@angular/common';
+import { inject } from '@angular/core';
+import { ReportService } from '../../service/report';
 
 @Component({
   selector: 'app-chilkooru-report',
@@ -9,6 +12,7 @@ import { DatePipe, CommonModule } from '@angular/common';
   styleUrl: './chilkooru-report.css'
 })
 export class ChilkooruReport {
+  private http = inject(HttpClient);
 
   today: Date = new Date();
 
@@ -74,6 +78,9 @@ export class ChilkooruReport {
     // Recalculate Monthly Sale = Previous month + today’s Gross Sale
     this.monthlySale = this.previousMonthlySale + this.grossSale.actual;
 
+    // you can add this inside if you want monthly sale update too
+    this.monthlySale = this.previousMonthlySale + this.grossSale.actual;
+
   }
 
   updateTotals() {
@@ -111,17 +118,68 @@ export class ChilkooruReport {
 
   // monthlySale code
   monthlySale: number = 0;
-  previousMonthlySale: number = 0; // fetched from backend
+  previousMonthlySale: number = 0;
+
+  constructor(private reportService: ReportService) { } // ✅ inject service
 
   ngOnInit() {
     this.loadPreviousMonthlySale();
   }
 
-  // Example: pull monthly total till yesterday from backend
   loadPreviousMonthlySale() {
-    // 🚀 Replace with API call
-    this.previousMonthlySale = 0; // backend result
-    this.updateGrossSale();
+    const today = new Date();
+    const month = today.toISOString().slice(0, 7); // "2025-08"
+
+    this.reportService.getMonthlySale(month).subscribe({
+      next: (res: { monthly_sale: number }) => { // ✅ add type
+        this.previousMonthlySale = res.monthly_sale || 0;
+        this.updateGrossSale();
+      },
+      error: (err: any) => { // ✅ add type
+        console.error("❌ Error loading monthly sale:", err);
+      }
+    });
   }
 
+
+  // submitReport Data Code
+  submitReport() {
+    const payload = {
+      today: this.today,
+      opening_balance: this.openingBalance,
+
+      gross_actual: this.grossSale.actual,
+      gross_system: this.grossSale.system,
+      gross_difference: this.grossSale.difference,
+
+      swipe_actual: this.swipe.actual,
+      swipe_system: this.swipe.system,
+      swipe_diff: this.swipe.difference,
+
+      upi_actual: this.upi.actual,
+      upi_system: this.upi.system,
+      upi_diff: this.upi.difference,
+
+      cash_actual: this.cash.actual,
+      cash_system: this.cash.system,
+      cash_diff: this.cash.difference,
+
+      total_actual: this.totalGSOB.actual,
+      total_system: this.totalGSOB.system,
+      total_diff: this.totalGSOB.difference,
+
+      amount_deposit: this.amountDeposit,
+      closing_balance: this.closingBalance,
+      monthly_sale: this.monthlySale,
+      total_expense: this.totalExpense,
+
+      denominations: this.denominations,
+      expenses: this.expenses
+    };
+
+    this.http.post('http://127.0.0.1:5000/save-report', payload).subscribe({
+      next: (res) => alert('Saved Report Data'),
+      error: (err) => alert('Error')
+    });
+  }
 }

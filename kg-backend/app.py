@@ -6,6 +6,7 @@ import mysql.connector
 import json
 import jwt
 import datetime
+from datetime import datetime, timedelta
 
 # ------------------------------
 # Flask Setup
@@ -276,7 +277,7 @@ def login():
         'email': user['email'],
         'role': user['role'],
         'permissions': permissions,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=12)
+         "exp": datetime.utcnow() + timedelta(hours=12)
     }
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
 
@@ -339,6 +340,96 @@ def reset_password():
     conn.close()
 
     return jsonify({'message': 'Password reset successful.'})   
+
+
+
+
+@app.route('/save-report', methods=['POST'])
+def save_report():
+    try:
+        data = request.get_json()
+        print("📥 Received Payload:", data)
+
+        # ✅ Convert ISO date to MySQL-friendly format
+        today_str = data.get('today')
+        if today_str:
+            today = datetime.fromisoformat(today_str.replace("Z", ""))  # remove Z
+            today_sql = today.strftime("%Y-%m-%d %H:%M:%S")  # works for DATETIME
+        else:
+            today_sql = None
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Example: insert into reports table
+        sql = """
+        INSERT INTO reports 
+        (today, opening_balance, gross_actual, gross_system, gross_difference,
+         swipe_actual, swipe_system, swipe_diff, upi_actual, upi_system, upi_diff,
+         cash_actual, cash_system, cash_diff, total_actual, total_system, total_diff,
+         amount_deposit, closing_balance, monthly_sale, total_expense)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        """
+
+        values = (
+            today_sql,  # ✅ cleaned date
+            data['opening_balance'], data['gross_actual'], data['gross_system'], data['gross_difference'],
+            data['swipe_actual'], data['swipe_system'], data['swipe_diff'],
+            data['upi_actual'], data['upi_system'], data['upi_diff'],
+            data['cash_actual'], data['cash_system'], data['cash_diff'],
+            data['total_actual'], data['total_system'], data['total_diff'],
+            data['amount_deposit'], data['closing_balance'], data['monthly_sale'],
+            data['total_expense']
+        )
+
+        cursor.execute(sql, values)
+        report_id = cursor.lastrowid
+
+        # ✅ Save denominations
+        for d in data['denominations']:
+            cursor.execute(
+                "INSERT INTO denominations (report_id, note, quantity, total) VALUES (%s,%s,%s,%s)",
+                (report_id, d['note'], d['quantity'], d['total'])
+            )
+
+        # ✅ Save expenses
+        for e in data['expenses']:
+            cursor.execute(
+                "INSERT INTO expenses (report_id, name, amount) VALUES (%s,%s,%s)",
+                (report_id, e['name'], e['amount'])
+            )
+
+        conn.commit()
+        cursor.close()
+        return jsonify({"message": "Report saved ✅"}), 201
+
+    except Exception as e:
+        print("❌ Error saving report:", e)
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/get-monthly-sale/<string:month>', methods=['GET'])
+def get_monthly_sale(month):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # month format = "2025-08" (YYYY-MM)
+        query = """
+            SELECT IFNULL(SUM(gross_actual), 0) as monthly_sale
+            FROM reports
+            WHERE DATE_FORMAT(today, '%Y-%m') = %s
+        """
+        cursor.execute(query, (month,))
+        result = cursor.fetchone()
+        cursor.close()
+
+        return jsonify({"monthly_sale": float(result["monthly_sale"])})
+    except Exception as e:
+        print("❌ Error fetching monthly sale:", e)
+        return jsonify({"error": str(e)}), 500
+
+
 
 # ------------------------------
 # Run App
