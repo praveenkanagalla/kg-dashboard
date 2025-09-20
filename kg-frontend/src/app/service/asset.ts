@@ -15,4 +15,12 @@ export class AssetService {
   addAsset(payload: any) {
     return this.http.post(`${this.apiUrl}/assets`, payload);
   }
+
+  updateAsset(id: number, payload: any) {
+    return this.http.put(`${this.apiUrl}/assets/${id}`, payload);
+  }
+
+  deleteAsset(id: number) {
+    return this.http.delete(`${this.apiUrl}/assets/${id}`);
+  }
 }

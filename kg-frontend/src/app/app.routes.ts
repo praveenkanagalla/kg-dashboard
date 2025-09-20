@@ -10,6 +10,7 @@ import { AllUsers } from './components/all-users/all-users';
 import { ChilkooruReport } from './components/chilkooru-report/chilkooru-report';
 import { SettlementReportTable } from './components/settlement-report-table/settlement-report-table';
 import { AddAsset } from './components/add-asset/add-asset';
+import { AssignAsset } from './components/assign-asset/assign-asset';
 
 export const routes: Routes = [
     { path: 'login', component: Login },
@@ -52,6 +53,11 @@ export const routes: Routes = [
                 component: AddAsset,
                 canActivate: [PermissionGuard],
                 data: { permission: 'view_add_new_asset' }
+            },
+            {
+                path: 'assign-asset',
+                component: AssignAsset,
+                canActivate: [PermissionGuard]
             }
         ]
     },

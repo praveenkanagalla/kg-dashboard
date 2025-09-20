@@ -1,3 +1,6 @@
+<div class="opne-assign-asset">
+    <button (click)="OpneAssignAsset()">Assign Asset</button>
+</div>
 <div class="asset-form">
     <h2>Add New Asset</h2>
     <form (ngSubmit)="saveAsset()">
@@ -31,6 +34,7 @@
                 <th>Model</th>
                 <th>Serial Number</th>
                 <th>Status</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -41,6 +45,10 @@
                 <td>{{ a.model }}</td>
                 <td>{{ a.serial_number }}</td>
                 <td>{{ a.status }}</td>
+                <td>
+                    <button class="btn-edit" (click)="editAsset(a)">Edit</button>
+                    <button class="btn-delete" (click)="deleteAsset(a.id)">Delete</button>
+                </td>
             </tr>
         </tbody>
     </table>

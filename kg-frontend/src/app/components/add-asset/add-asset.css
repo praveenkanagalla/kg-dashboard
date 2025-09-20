@@ -1,3 +1,25 @@
+.opne-assign-asset {
+    max-width: 1040px;
+    margin: 0 auto;
+}
+
+.opne-assign-asset button {
+    background-color: #ac4410;
+    color: #fff;
+    padding: 8px 16px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.opne-assign-asset button:hover {
+    background-color: #762e0a;
+    transform: translateY(-2px);
+}
+
 .asset-form {
     max-width: 1000px;
     margin: 20px auto;
@@ -109,4 +131,35 @@
 .asset-list tbody tr:hover {
     background: #eef6fc;
     transition: background 0.2s ease-in-out;
+}
+
+/* Action buttons container */
+.asset-list td button {
+    margin-right: 6px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Edit button */
+.asset-list .btn-edit {
+    background: #27ae60;
+    color: #fff;
+}
+
+.asset-list .btn-edit:hover {
+    background: #1e8449;
+}
+
+/* Delete button */
+.asset-list .btn-delete {
+    background: #e74c3c;
+    color: #fff;
+}
+
+.asset-list .btn-delete:hover {
+    background: #c0392b;
 }

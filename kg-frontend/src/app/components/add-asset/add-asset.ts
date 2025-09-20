@@ -2,53 +2,95 @@ import { Component, OnInit } from '@angular/core';
 import { AssetService } from '../../service/asset';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../../service/auth';
 
 @Component({
   selector: 'app-add-asset',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, RouterModule],
   templateUrl: './add-asset.html',
   styleUrls: ['./add-asset.css']
 })
 export class AddAsset implements OnInit {
 
-  // Form model for adding asset
   asset = {
+    id: null,
     asset_tag: '',
     type: '',
     brand: '',
     model: '',
-    serial_number: ''
+    serial_number: '',
+    status: 'Available'
   };
 
-  // List of all assets
   assets: any[] = [];
+  isEditing: boolean = false;
 
-  constructor(private assetService: AssetService) { }
+  constructor(private assetService: AssetService, public auth: AuthService, private router: Router) { }
 
   ngOnInit(): void {
     this.loadAssets();
   }
 
-  // Save a new asset
   saveAsset() {
-    this.assetService.addAsset(this.asset).subscribe({
-      next: (res) => {
-        alert('✅ Asset Added Successfully');
-        this.asset = { asset_tag: '', type: '', brand: '', model: '', serial_number: '' }; // reset form
-        this.loadAssets(); // refresh list after adding
-      },
-      error: (err) => {
-        if (err.error && err.error.error) {
-          alert("Error: " + err.error.error);
-        } else {
-          alert("Unexpected error occurred while adding asset.");
+    if (this.isEditing && this.asset.id) {
+      this.assetService.updateAsset(this.asset.id, this.asset).subscribe({
+        next: () => {
+          alert('Asset Updated Successfully');
+          this.resetForm();
+          this.loadAssets();
+        },
+        error: (err) => {
+          alert("Error updating asset: " + (err.error?.error || 'Unexpected error'));
         }
-      }
-    });
+      });
+    } else {
+      this.assetService.addAsset(this.asset).subscribe({
+        next: () => {
+          alert('Asset Added Successfully');
+          this.resetForm();
+          this.loadAssets();
+        },
+        error: (err) => {
+          alert("Error adding asset: " + (err.error?.error || 'Unexpected error'));
+        }
+      });
+    }
   }
 
-  // Load all assets
+  editAsset(asset: any) {
+    this.asset = { ...asset };
+    this.isEditing = true;
+  }
+
+  resetForm() {
+    this.asset = {
+      id: null,
+      asset_tag: '',
+      type: '',
+      brand: '',
+      model: '',
+      serial_number: '',
+      status: 'Available'
+    };
+    this.isEditing = false;
+  }
+
+  deleteAsset(id: number) {
+    if (confirm('Are you sure you want to delete this asset?')) {
+      this.assetService.deleteAsset(id).subscribe({
+        next: () => {
+          alert('Asset deleted successfully');
+          this.loadAssets();
+        },
+        error: (err) => {
+          alert("Error deleting asset: " + (err.error?.error || 'Unexpected error'));
+        }
+      });
+    }
+  }
+
   loadAssets() {
     this.assetService.getAssets().subscribe({
       next: (res) => {
@@ -58,5 +100,9 @@ export class AddAsset implements OnInit {
         console.error('Error fetching assets', err);
       }
     });
+  }
+
+  OpneAssignAsset() {
+    this.router.navigate(['/', this.auth.getRoleDashboard(), 'assign-asset']);
   }
 }

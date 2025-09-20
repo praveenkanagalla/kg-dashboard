@@ -473,91 +473,179 @@ def add_asset():
         return jsonify({"error": str(e)}), 500
 
 
-# Assign asset
-@app.route("/assign_asset", methods=["POST"])
-def assign_asset():
+# Update asset
+@app.route('/assets/<int:asset_id>', methods=['PUT'])
+def update_asset(asset_id):
     try:
         data = request.json
         conn = get_db_connection()
         cursor = conn.cursor()
+
+        # Check if asset exists
+        cursor.execute("SELECT id FROM assets WHERE id=%s", (asset_id,))
+        existing = cursor.fetchone()
+        if not existing:
+            cursor.close()
+            conn.close()
+            return jsonify({"error": "Asset not found"}), 404
+
+        query = """
+            UPDATE assets
+            SET asset_tag=%s, type=%s, brand=%s, model=%s, serial_number=%s, status=%s
+            WHERE id=%s
+        """
+        values = (
+            data.get("asset_tag"),
+            data.get("type"),
+            data.get("brand"),
+            data.get("model"),
+            data.get("serial_number"),
+            data.get("status", "Available"),
+            asset_id
+        )
+        cursor.execute(query, values)
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Asset updated successfully"}), 200
+
+    except Exception as e:
+        print("❌ Error updating asset:", e)
+        return jsonify({"error": str(e)}), 500
+
+
+# Delete asset
+@app.route('/assets/<int:asset_id>', methods=['DELETE'])
+def delete_asset(asset_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check if asset exists
+        cursor.execute("SELECT id FROM assets WHERE id=%s", (asset_id,))
+        existing = cursor.fetchone()
+        if not existing:
+            cursor.close()
+            conn.close()
+            return jsonify({"error": "Asset not found"}), 404
+
+        cursor.execute("DELETE FROM assets WHERE id=%s", (asset_id,))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Asset deleted successfully"}), 200
+
+    except Exception as e:
+        print("❌ Error deleting asset:", e)
+        return jsonify({"error": str(e)}), 500
+
+
+# ------------------------------
+# Assign Asset to User
+# ------------------------------
+@app.route("/assign_asset_to_user", methods=["POST"])
+def assign_asset_to_user():
+    try:
+        data = request.json
+        user_id = data.get("user_id")
+        asset_id = data.get("asset_id")
+
+        if not user_id or not asset_id:
+            return jsonify({"error": "user_id and asset_id are required"}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check if asset exists and is available
+        cursor.execute("SELECT status FROM assets WHERE id=%s", (asset_id,))
+        asset = cursor.fetchone()
+        if not asset:
+            cursor.close()
+            conn.close()
+            return jsonify({"error": "Asset not found"}), 404
+        if asset[0] == "Assigned":
+            cursor.close()
+            conn.close()
+            return jsonify({"error": "Asset already assigned"}), 400
 
         # Insert into assignments table
-        query = "INSERT INTO asset_assignments (employee_id, asset_id, assigned_date) VALUES (%s, %s, NOW())"
-        values = (data["employee_id"], data["asset_id"])
-        cursor.execute(query, values)
+        cursor.execute(
+            "INSERT INTO asset_assignments (asset_id, user_id) VALUES (%s, %s)",
+            (asset_id, user_id)
+        )
 
         # Update asset status
-        cursor.execute("UPDATE assets SET status='Assigned' WHERE id=%s", (data["asset_id"],))
-        conn.commit()
+        cursor.execute(
+            "UPDATE assets SET status='Assigned' WHERE id=%s",
+            (asset_id,)
+        )
 
+        conn.commit()
         cursor.close()
         conn.close()
-        return jsonify({"message": "Asset assigned successfully!"}), 201
+        return jsonify({"message": "Asset assigned successfully ✅"}), 201
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
-# Unassign (return) asset
-@app.route("/return_asset", methods=["POST"])
-def return_asset():
-    try:
-        data = request.json
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        # Mark return date
-        cursor.execute("""
-            UPDATE asset_assignments 
-            SET return_date=NOW() 
-            WHERE asset_id=%s AND return_date IS NULL
-        """, (data["asset_id"],))
-
-        # Update asset status
-        cursor.execute("UPDATE assets SET status='Available' WHERE id=%s", (data["asset_id"],))
-        conn.commit()
-
-        cursor.close()
-        conn.close()
-        return jsonify({"message": "Asset returned successfully!"}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-# Dashboard summary
-@app.route("/dashboard", methods=["GET"])
-def dashboard():
+# ------------------------------
+# Get All Assigned Assets
+# ------------------------------
+@app.route("/assigned_assets", methods=["GET"])
+def get_assigned_assets():
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-
-        # Count assets by status
-        cursor.execute("SELECT status, COUNT(*) as count FROM assets GROUP BY status")
-        assets_status = cursor.fetchall()
-
-        # List currently assigned assets
         cursor.execute("""
-            SELECT e.name, a.asset_tag, a.type, aa.assigned_date 
+            SELECT aa.id, a.asset_tag, a.type, a.brand, a.model,
+                   u.name AS user_name, u.department, aa.assigned_date, aa.status
             FROM asset_assignments aa
-            JOIN users e ON e.id = aa.employee_id   -- use users table instead of employees
-            JOIN assets a ON a.id = aa.asset_id
-            WHERE aa.return_date IS NULL
+            JOIN assets a ON aa.asset_id = a.id
+            JOIN users u ON aa.user_id = u.id
         """)
-        assigned_assets = cursor.fetchall()
-
-        # Available count
-        cursor.execute("SELECT COUNT(*) as total FROM assets WHERE status='Available'")
-        available_count = cursor.fetchone()["total"]
-
+        rows = cursor.fetchall()
         cursor.close()
         conn.close()
-
-        return jsonify({
-            "assets_status": assets_status,
-            "assigned_assets": assigned_assets,
-            "available_count": available_count
-        })
+        return jsonify(rows)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# ------------------------------
+# Return Asset
+# ------------------------------
+@app.route("/return_asset/<int:assignment_id>", methods=["PUT"])
+def return_asset(assignment_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Update assignment status
+        cursor.execute("""
+            UPDATE asset_assignments 
+            SET status='returned', return_date=NOW() 
+            WHERE id=%s
+        """, (assignment_id,))
+
+        # Get asset_id to update asset table
+        cursor.execute("SELECT asset_id FROM asset_assignments WHERE id=%s", (assignment_id,))
+        asset_id = cursor.fetchone()[0]
+
+        # Update asset status
+        cursor.execute("UPDATE assets SET status='Available' WHERE id=%s", (asset_id,))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Asset returned successfully ✅"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 
 # ------------------------------
 # Run App
