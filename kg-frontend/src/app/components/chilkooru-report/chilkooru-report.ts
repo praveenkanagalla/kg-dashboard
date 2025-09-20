@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { DatePipe, CommonModule } from '@angular/common';
 import { inject } from '@angular/core';
 import { ReportService } from '../../service/report';
+import { AuthService } from '../../service/auth';
+import { RouterModule, Router } from '@angular/router';
 
 @Component({
   selector: 'app-chilkooru-report',
@@ -120,7 +122,7 @@ export class ChilkooruReport {
   monthlySale: number = 0;
   previousMonthlySale: number = 0;
 
-  constructor(private reportService: ReportService) { } // ✅ inject service
+  constructor(private reportService: ReportService, public auth: AuthService, private router: Router) { } // ✅ inject service
 
   ngOnInit() {
     this.loadPreviousMonthlySale();
@@ -181,5 +183,9 @@ export class ChilkooruReport {
       next: (res) => alert('Saved Report Data'),
       error: (err) => alert('Error')
     });
+  }
+
+  backButton() {
+    this.router.navigate(['/', this.auth.getRoleDashboard(), 'Settlement-report-table']);
   }
 }

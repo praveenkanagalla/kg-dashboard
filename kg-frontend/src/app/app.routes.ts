@@ -3,14 +3,13 @@ import { Login } from './components/login/login';
 import { ForgotPassword } from './components/forgot-password/forgot-password';
 import { ResetPassword } from './components/reset-password/reset-password';
 import { Dashboard } from './pages/dashboard/dashboard';
-import { CreateNewUser } from './components/create-new-user/create-new-user';
 import { PermissionGuard } from './permission-guard';
 import { Settings } from './components/settings/settings';
-import { UserDetails } from './components/user-details/user-details';
 import { NewEmployee } from './components/new-employee/new-employee';
-import { AuthGuard } from './guards/auth-guard';
 import { AllUsers } from './components/all-users/all-users';
 import { ChilkooruReport } from './components/chilkooru-report/chilkooru-report';
+import { SettlementReportTable } from './components/settlement-report-table/settlement-report-table';
+import { AddAsset } from './components/add-asset/add-asset';
 
 export const routes: Routes = [
     { path: 'login', component: Login },
@@ -20,22 +19,17 @@ export const routes: Routes = [
         path: ':role-dashboard',
         component: Dashboard,
         children: [
-            // {
-            //     path: 'user/:id',          // user detail page
-            //     component: UserDetails,
-            //     canActivate: [AuthGuard]
-            // },
-            {
-                path: 'create-new-user',   // create user page
-                component: CreateNewUser,
-                canActivate: [PermissionGuard],
-                data: { permission: 'view_create_new_user' }
-            },
             {
                 path: 'new-employee',
                 component: NewEmployee,
                 canActivate: [PermissionGuard],
                 data: { permission: 'view_new_employee' }
+            },
+            {
+                path: 'Settlement-report-table',
+                component: SettlementReportTable,
+                canActivate: [PermissionGuard],
+                data: { permission: 'view_Settlement_report_table' }
             },
             {
                 path: 'chilkooru-report',
@@ -48,12 +42,17 @@ export const routes: Routes = [
                 component: AllUsers,
             },
             {
-                path: 'settings',          // settings page
+                path: 'settings',
                 component: Settings,
                 canActivate: [PermissionGuard],
                 data: { permission: 'view_settings' }
             },
-
+            {
+                path: 'add-new-asset',
+                component: AddAsset,
+                canActivate: [PermissionGuard],
+                data: { permission: 'view_add_new_asset' }
+            }
         ]
     },
 

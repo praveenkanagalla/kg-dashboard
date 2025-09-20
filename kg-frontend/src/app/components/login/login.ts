@@ -26,8 +26,8 @@ export class Login {
         // Redirect based on role
         this.router.navigate([`/${res.role}-dashboard`]);
       },
-      error: () => {
-        this.error = 'Invalid email or password.';
+      error: (err) => {
+        this.error = err.error?.message || 'Login failed';
       }
     });
   }

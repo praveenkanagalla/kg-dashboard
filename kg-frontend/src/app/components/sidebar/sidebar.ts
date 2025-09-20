@@ -22,9 +22,11 @@ export class Sidebar implements OnInit {
   roleDashboard: string = '';
 
   allPermissions = [
-    { name: 'Create User', route: 'view_create_new_user' },
     { name: 'Create New Employee', route: 'view_new_employee' },
-    { name: 'Settings', route: 'view_settings' }
+    { name: 'Settings', route: 'view_settings' },
+    { name: 'Settlement-report-table', route: 'view_Settlement_report_table' },
+    { name: 'all-users', route: 'view_all_users' },
+    { name: 'add-new-asset', route: 'view_add_new_asset' }
   ];
 
   constructor(private http: HttpClient, public auth: AuthService, private router: Router) { }
@@ -80,10 +82,6 @@ export class Sidebar implements OnInit {
     return allowed;
   }
 
-  getCreateUserLink(): string[] {
-    return ['/', this.auth.getRoleDashboard(), 'create-new-user'];
-  }
-
   getNEwEmployeeLink(): string[] {
     return ['/', this.auth.getRoleDashboard(), 'new-employee'];
   }
@@ -92,12 +90,16 @@ export class Sidebar implements OnInit {
     return ['/', this.auth.getRoleDashboard(), 'settings'];
   }
 
-  openAllUsers(): void {
-    this.router.navigate(['/', this.auth.getRoleDashboard(), 'all-users']);
+  getAllUsersLink(): string[] {
+    return ['/', this.auth.getRoleDashboard(), 'all-users'];
   }
 
-  getChilkooruReportLink(): string[] {
-    return ['/', this.auth.getRoleDashboard(), 'chilkooru-report'];
+  getSettlementReportTableLink(): string[] {
+    return ['/', this.auth.getRoleDashboard(), 'Settlement-report-table'];
+  }
+
+  getAddNewAssetLink(): string[] {
+    return ['/', this.auth.getRoleDashboard(), 'add-new-asset'];
   }
 
   // dropdown code

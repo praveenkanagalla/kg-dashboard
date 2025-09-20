@@ -1,1 +1,49 @@
-<p>settlement-report-table</p>
+<div class="settlement-report-container">
+    <h2>Store Settlement / Closing Report</h2>
+    <!-- 🔍 Search & Filter Section -->
+    <h3>Search / Filter Reports</h3>
+    <div class="filter-section">
+        <input type="text" placeholder="Search" [(ngModel)]="searchText" (input)="applyFilter()" />
+
+        <label>Store:</label>
+        <select [(ngModel)]="filter.store" (change)="applyFilter()">
+            <option value="">All Stores</option>
+            <option *ngFor="let s of stores" [value]="s">{{ s }}</option>
+        </select>
+        <label>From Date:</label>
+        <input type="date" [(ngModel)]="filter.fromDate" (change)="applyFilter()" />
+
+        <label>To Date:</label>
+        <input type="date" [(ngModel)]="filter.toDate" (change)="applyFilter()" />
+
+        <button (click)="NewReport()">New</button>
+    </div>
+
+    <!-- Settlement Report Table -->
+    <h3>Settlement Reports</h3>
+    <table border="1" class="report-table">
+        <thead>
+            <tr>
+                <th>S.No</th>
+                <th>Date</th>
+                <th>Manager Name</th>
+                <th>Store Name</th>
+                <th>Total Amount</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let report of filteredReports; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ report.date }}</td>
+                <td>{{ report.employee }}</td>
+                <td>{{ report.store }}</td>
+                <td>{{ report.total_amount }}</td>
+                <td>
+                    <button>Edit</button>
+                    <button>View</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

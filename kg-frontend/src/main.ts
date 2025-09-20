@@ -9,4 +9,5 @@ bootstrapApplication(App, {
     ...(appConfig.providers || []),
     provideCharts()
   ]
+
 }).catch((err) => console.error(err));

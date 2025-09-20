@@ -25,7 +25,11 @@ export class NewEmployee implements OnInit {
 
   allPermissions = [
     { name: 'Create New Employee', route: 'view_new_employee' },
-    { name: 'Settings', route: 'view_settings' }
+    { name: 'Settings', route: 'view_settings' },
+    { name: 'Settlement-report-table', route: 'view_Settlement_report_table' },
+    { name: 'all-users', route: 'view_all_users' },
+    { name: 'add-new-asset', route: 'view_add_new_asset' }
+
   ];
 
   permissionsList = [...this.allPermissions]; // filtered in ngOnInit

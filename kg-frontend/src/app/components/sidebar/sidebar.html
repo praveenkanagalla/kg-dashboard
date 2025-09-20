@@ -1,13 +1,6 @@
 <div class="sidebar">
     <ul class="sidebar-content">
         <li>
-            <a class="sidebar-nav" *ngIf="auth.hasPermission('view_create_new_user')" [routerLink]="getCreateUserLink()"
-                routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
-                Create New User
-            </a>
-        </li>
-
-        <li>
             <a class="sidebar-nav" *ngIf="auth.hasPermission('view_create_new_user')"
                 [routerLink]="getNEwEmployeeLink()" routerLinkActive="active-link"
                 [routerLinkActiveOptions]="{ exact: true }">
@@ -22,16 +15,16 @@
             </a>
         </li>
 
-        <!-- Admin-only All Users button -->
-        <li *ngIf="role === 'Admin'">
-            <a routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }"
-                class="sidebar-nav all-users-btn" (click)="openAllUsers()">
+        <li>
+            <a class="sidebar-nav  all-users-btn" *ngIf="auth.hasPermission('view_all_users')"
+                [routerLink]="getAllUsersLink()" routerLinkActive="active-link"
+                [routerLinkActiveOptions]="{ exact: true }">
                 All Users
             </a>
         </li>
 
         <!-- Dropdown for Stores -->
-        <li class="dropdown">
+        <!-- <li class="dropdown" *ngIf="role === 'Admin'">
             <a class="sidebar-nav" (click)="toggleStoreDropdown()">
                 Stores
                 <span class="arrow" [class.open]="isStoreDropdownOpen">&#9662;</span>
@@ -47,6 +40,20 @@
                 <li><a class="sidebar-subnav" routerLink="/stores/kukatpally">Kukatpally Store</a></li>
                 <li><a class="sidebar-subnav" routerLink="/stores/lb-nagar">LB Nagar Store</a></li>
             </ul>
+        </li> -->
+        <li>
+            <a class="sidebar-subnav" *ngIf="auth.hasPermission('view_Settlement_report_table')"
+                [routerLink]=" getSettlementReportTableLink()" routerLinkActive="active-link"
+                [routerLinkActiveOptions]="{ exact: true }">
+                Settlement Report Table
+            </a>
+        </li>
+        <li>
+            <a class="sidebar-subnav" *ngIf="auth.hasPermission('view_add_new_asset')"
+                [routerLink]=" getAddNewAssetLink()" routerLinkActive="active-link"
+                [routerLinkActiveOptions]="{ exact: true }">
+                Add New Asset
+            </a>
         </li>
     </ul>
 </div>

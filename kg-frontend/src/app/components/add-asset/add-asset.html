@@ -1,0 +1,47 @@
+<div class="asset-form">
+    <h2>Add New Asset</h2>
+    <form (ngSubmit)="saveAsset()">
+        <input [(ngModel)]="asset.asset_tag" name="asset_tag" placeholder="Asset Tag" required />
+
+        <!-- FIX: Use select for ENUM type -->
+        <select [(ngModel)]="asset.type" name="type" required>
+            <option value="" disabled selected>Select Type</option>
+            <option value="Laptop">Laptop</option>
+            <option value="Desktop">Desktop</option>
+            <option value="Phone">Phone</option>
+            <option value="Tablet">Tablet</option>
+            <option value="Other">Other</option>
+        </select>
+
+        <input [(ngModel)]="asset.brand" name="brand" placeholder="Brand" required />
+        <input [(ngModel)]="asset.model" name="model" placeholder="Model" required />
+        <input [(ngModel)]="asset.serial_number" name="serial_number" placeholder="Serial Number" required />
+        <button type="submit">Save Asset</button>
+    </form>
+</div>
+
+<div class="asset-list">
+    <h2>Assets List</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Tag</th>
+                <th>Type</th>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>Serial Number</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let a of assets">
+                <td>{{ a.asset_tag }}</td>
+                <td>{{ a.type }}</td>
+                <td>{{ a.brand }}</td>
+                <td>{{ a.model }}</td>
+                <td>{{ a.serial_number }}</td>
+                <td>{{ a.status }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

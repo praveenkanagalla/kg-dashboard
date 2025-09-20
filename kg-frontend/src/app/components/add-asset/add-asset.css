@@ -1,0 +1,112 @@
+.asset-form {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.asset-form h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+/* Form Layout - 3 inputs per row */
+.asset-form form {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+/* Inputs & Select */
+.asset-form input,
+.asset-form select {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.asset-form input:focus,
+.asset-form select:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 4px rgba(52, 152, 219, 0.4);
+}
+
+.asset-form button {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #ac4410;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.asset-form button:hover {
+    background: #762e0a;
+}
+
+.asset-list {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 20px;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.asset-list h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+/* Table styling */
+.asset-list table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Table header */
+.asset-list thead {
+    background: #3498db;
+    color: #fff;
+}
+
+.asset-list th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Table rows */
+.asset-list td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    color: #333;
+}
+
+/* Zebra effect */
+.asset-list tbody tr:nth-child(even) {
+    background: #f9fbfd;
+}
+
+/* Hover effect */
+.asset-list tbody tr:hover {
+    background: #eef6fc;
+    transition: background 0.2s ease-in-out;
+}

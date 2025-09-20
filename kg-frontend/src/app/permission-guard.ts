@@ -9,9 +9,8 @@ export class PermissionGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     // ===== 1. Check role matches the URL =====
-    const roleDashboard = route.parent?.params['role-dashboard']; // e.g. "admin-dashboard"
-    const userRoleDashboard = this.auth.getRoleDashboard(); // e.g. "admin-dashboard"
-
+    const roleDashboard = route.parent?.params['role-dashboard'];
+    const userRoleDashboard = this.auth.getRoleDashboard();
     if (roleDashboard && roleDashboard !== userRoleDashboard) {
       this.router.navigate(['/login']);
       return false;
@@ -24,10 +23,11 @@ export class PermissionGuard implements CanActivate {
     if (!requiredPermission) {
       const routePath = route.routeConfig?.path || '';
       const permissionMap: { [key: string]: string } = {
-        'create-new-user': 'view_create_new_user',
         'new-employee': 'view_new_employee',
         'settings': 'view_settings',
-        'chilkooru-report': 'view_chilkooru_report'
+        'all-users': 'view_all_users',
+        'Settlement-report-table': 'view_Settlement_report_table',
+        'add-new-asset': 'view_add_new_asset'
       };
       requiredPermission = permissionMap[routePath];
     }
@@ -37,7 +37,13 @@ export class PermissionGuard implements CanActivate {
       this.router.navigate([`/${userRoleDashboard}`]); // back to dashboard
       return false;
     }
-
     return true;
   }
 }
+
+
+
+// --first create Add new asset and list of assets one component
+// -- how Assets assigned Employee and Reports(Total assets by type, Assets assigned vs available,
+//    Assets by condition(working, repair, retired)
+//     one component angular20 and python my sql work beanch code step by step

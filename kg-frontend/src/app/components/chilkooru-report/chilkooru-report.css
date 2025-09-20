@@ -1,6 +1,15 @@
+.table-report-container {
+    width: 1100px;
+    margin: 0 auto;
+}
+
 .chilkooru-report-container {
     width: 100%;
     overflow: hidden;
+}
+
+.submitReport-btn-container {
+    display: flex;
 }
 
 .submitReport-btn {
@@ -21,11 +30,11 @@
 }
 
 .chilkooru-report-table-1 {
-    width: 70%;
+    width: 74.5%;
 }
 
 .chilkooru-report-table-2 {
-    width: 30%;
+    width: 25.5%;
 }
 
 .chilkooru-report-table-1,
@@ -143,11 +152,11 @@ tfoot .footer {
 }
 
 .chilkooru-report-table-3 {
-    width: 40%;
+    width: 37%;
 }
 
 .instore-expenses {
-    width: 55%;
+    width: 61%;
     text-align: center;
 }
 
@@ -214,14 +223,19 @@ tfoot .footer {
 .reason-text {
     width: 200px;
     text-align: left;
-    display: block;
     overflow: auto;
 }
 
 .expenses-text {
-    width: 550px;
     text-align: left;
-    display: block;
     overflow: auto;
-    border: 0;
+    border: none;
+}
+
+.remarks-header {
+    background: #98441a;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    font-size: 16px;
 }

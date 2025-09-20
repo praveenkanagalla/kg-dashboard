@@ -428,14 +428,139 @@ def get_monthly_sale(month):
     except Exception as e:
         print("❌ Error fetching monthly sale:", e)
         return jsonify({"error": str(e)}), 500
+    
+
+# Get all assets
+@app.route("/assets", methods=["GET"])
+def get_assets():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM assets")
+        assets = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return jsonify(assets)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
+# Add new asset
+@app.route("/assets", methods=["POST"])
+def add_asset():
+    try:
+        data = request.json
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        query = """
+            INSERT INTO assets (asset_tag, type, brand, model, serial_number, status) 
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        values = (
+            data["asset_tag"],
+            data["type"],
+            data["brand"],
+            data["model"],
+            data["serial_number"],
+            "Available"
+        )
+        cursor.execute(query, values)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Asset added successfully!"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# Assign asset
+@app.route("/assign_asset", methods=["POST"])
+def assign_asset():
+    try:
+        data = request.json
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Insert into assignments table
+        query = "INSERT INTO asset_assignments (employee_id, asset_id, assigned_date) VALUES (%s, %s, NOW())"
+        values = (data["employee_id"], data["asset_id"])
+        cursor.execute(query, values)
+
+        # Update asset status
+        cursor.execute("UPDATE assets SET status='Assigned' WHERE id=%s", (data["asset_id"],))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Asset assigned successfully!"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# Unassign (return) asset
+@app.route("/return_asset", methods=["POST"])
+def return_asset():
+    try:
+        data = request.json
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Mark return date
+        cursor.execute("""
+            UPDATE asset_assignments 
+            SET return_date=NOW() 
+            WHERE asset_id=%s AND return_date IS NULL
+        """, (data["asset_id"],))
+
+        # Update asset status
+        cursor.execute("UPDATE assets SET status='Available' WHERE id=%s", (data["asset_id"],))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Asset returned successfully!"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# Dashboard summary
+@app.route("/dashboard", methods=["GET"])
+def dashboard():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Count assets by status
+        cursor.execute("SELECT status, COUNT(*) as count FROM assets GROUP BY status")
+        assets_status = cursor.fetchall()
+
+        # List currently assigned assets
+        cursor.execute("""
+            SELECT e.name, a.asset_tag, a.type, aa.assigned_date 
+            FROM asset_assignments aa
+            JOIN users e ON e.id = aa.employee_id   -- use users table instead of employees
+            JOIN assets a ON a.id = aa.asset_id
+            WHERE aa.return_date IS NULL
+        """)
+        assigned_assets = cursor.fetchall()
+
+        # Available count
+        cursor.execute("SELECT COUNT(*) as total FROM assets WHERE status='Available'")
+        available_count = cursor.fetchone()["total"]
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "assets_status": assets_status,
+            "assigned_assets": assigned_assets,
+            "available_count": available_count
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # ------------------------------
 # Run App
 # ------------------------------
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-    # Do you want me to also link the "Total (GS + OB)" row (row 6) so it automatically updates when Gross Sale + Opening Balance changes?
