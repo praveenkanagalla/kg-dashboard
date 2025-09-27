@@ -601,7 +601,8 @@ def get_assigned_assets():
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT aa.id, a.asset_tag, a.type, a.brand, a.model,
-                   u.name AS user_name, u.department, aa.assigned_date, aa.status
+                   u.name AS user_name, u.department,
+                   aa.assigned_date, aa.return_date, aa.status
             FROM asset_assignments aa
             JOIN assets a ON aa.asset_id = a.id
             JOIN users u ON aa.user_id = u.id

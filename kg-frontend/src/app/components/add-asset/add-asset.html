@@ -1,30 +1,49 @@
-<div class="opne-assign-asset">
-    <button (click)="OpneAssignAsset()">Assign Asset</button>
-</div>
-<div class="asset-form">
-    <h2>Add New Asset</h2>
-    <form (ngSubmit)="saveAsset()">
-        <input [(ngModel)]="asset.asset_tag" name="asset_tag" placeholder="Asset Tag" required />
-
-        <!-- FIX: Use select for ENUM type -->
-        <select [(ngModel)]="asset.type" name="type" required>
-            <option value="" disabled selected>Select Type</option>
-            <option value="Laptop">Laptop</option>
-            <option value="Desktop">Desktop</option>
-            <option value="Phone">Phone</option>
-            <option value="Tablet">Tablet</option>
-            <option value="Other">Other</option>
-        </select>
-
-        <input [(ngModel)]="asset.brand" name="brand" placeholder="Brand" required />
-        <input [(ngModel)]="asset.model" name="model" placeholder="Model" required />
-        <input [(ngModel)]="asset.serial_number" name="serial_number" placeholder="Serial Number" required />
-        <button type="submit">Save Asset</button>
-    </form>
+<!-- + Add New Asset Button -->
+<div class="add-asset-btn">
+    <button (click)="openModal()" class="open-assign-asset-btn">+ Add New Asset</button>
 </div>
 
+<!-- Modal -->
+<div class="modal-backdrop" *ngIf="showModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>{{ isEditing ? 'Edit Asset' : 'Add New Asset' }}</h2>
+            <button class="close-btn" (click)="closeModal()">✖</button>
+        </div>
+
+        <div class="modal-body">
+            <form (ngSubmit)="saveAsset()" class="asset-form">
+                <input [(ngModel)]="asset.asset_tag" name="asset_tag" placeholder="Asset Tag" required />
+
+                <select [(ngModel)]="asset.type" name="type" required>
+                    <option value="" disabled selected>Select Type</option>
+                    <option value="Laptop">Laptop</option>
+                    <option value="Desktop">Desktop</option>
+                    <option value="Phone">Phone</option>
+                    <option value="Tablet">Tablet</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <input [(ngModel)]="asset.brand" name="brand" placeholder="Brand" required />
+                <input [(ngModel)]="asset.model" name="model" placeholder="Model" required />
+                <input [(ngModel)]="asset.serial_number" name="serial_number" placeholder="Serial Number" required />
+
+                <div class="modal-actions">
+                    <button type="submit">{{ isEditing ? 'Update' : 'Save' }}</button>
+                    <button type="button" (click)="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Asset List -->
 <div class="asset-list">
     <h2>Assets List</h2>
+
+    <!-- 🔍 Search box -->
+    <input type="text" [(ngModel)]="searchTerm" placeholder="Search to Here..." class="asset-list-search-box" />
+
     <table>
         <thead>
             <tr>
@@ -38,7 +57,8 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let a of assets">
+            <!-- use filteredAssets() here -->
+            <tr *ngFor="let a of filteredAssets()">
                 <td>{{ a.asset_tag }}</td>
                 <td>{{ a.type }}</td>
                 <td>{{ a.brand }}</td>
@@ -46,8 +66,12 @@
                 <td>{{ a.serial_number }}</td>
                 <td>{{ a.status }}</td>
                 <td>
-                    <button class="btn-edit" (click)="editAsset(a)">Edit</button>
-                    <button class="btn-delete" (click)="deleteAsset(a.id)">Delete</button>
+                    <button class="btn-edit" (click)="editAsset(a); openModal()">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                    <button class="btn-delete" (click)="deleteAsset(a.id)">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </td>
             </tr>
         </tbody>

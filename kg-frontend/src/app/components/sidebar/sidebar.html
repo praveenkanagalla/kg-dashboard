@@ -32,7 +32,7 @@
             <ul class="dropdown-menu" *ngIf="isStoreDropdownOpen">
                 <li>
                     <a class="sidebar-subnav" *ngIf="auth.hasPermission('view_chilkooru_report')"
-                        [routerLink]="getChilkooruReportLink()" routerLinkActive="active-link"
+                        [routerLink]="getSettlementReportTableLink()" routerLinkActive="active-link"
                         [routerLinkActiveOptions]="{ exact: true }">
                         Chilkooru Report
                     </a>
@@ -41,6 +41,7 @@
                 <li><a class="sidebar-subnav" routerLink="/stores/lb-nagar">LB Nagar Store</a></li>
             </ul>
         </li> -->
+
         <li>
             <a class="sidebar-subnav" *ngIf="auth.hasPermission('view_Settlement_report_table')"
                 [routerLink]=" getSettlementReportTableLink()" routerLinkActive="active-link"
@@ -48,12 +49,29 @@
                 Settlement Report Table
             </a>
         </li>
-        <li>
-            <a class="sidebar-subnav" *ngIf="auth.hasPermission('view_add_new_asset')"
-                [routerLink]=" getAddNewAssetLink()" routerLinkActive="active-link"
-                [routerLinkActiveOptions]="{ exact: true }">
-                Add New Asset
+
+        <!-- Dropdown for Asset and Assign -->
+        <li class="dropdown" *ngIf="role === 'Admin'">
+            <a class="sidebar-nav" (click)="toggleAssetAndAssignDropdown()">
+                Asset and Assign
+                <span class="arrow" [class.open]="isAssetAndAssignDropdownOpen">&#9662;</span>
             </a>
+            <ul class="dropdown-menu" *ngIf="isAssetAndAssignDropdownOpen">
+                <li>
+                    <a class="sidebar-subnav" *ngIf="auth.hasPermission('view_add_new_asset')"
+                        [routerLink]=" getAddNewAssetLink()" routerLinkActive="active-link"
+                        [routerLinkActiveOptions]="{ exact: true }">
+                        Add New Asset
+                    </a>
+                </li>
+                <li>
+                    <a class="sidebar-subnav" *ngIf="auth.hasPermission('view_asset_assign_to_employee')"
+                        [routerLink]=" getAssetAssignToEmployeeLink()" routerLinkActive="active-link"
+                        [routerLinkActiveOptions]="{ exact: true }">
+                        Asset Assign to Employee
+                    </a>
+                </li>
+            </ul>
         </li>
     </ul>
 </div>

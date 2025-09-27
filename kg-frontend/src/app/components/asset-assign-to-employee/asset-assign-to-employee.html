@@ -1,0 +1,72 @@
+<div class="assign-asset-container">
+    <!-- Button to open modal -->
+    <button class="assign-btn" (click)="openModal()">Assign Asset to Employee</button>
+
+    <!-- Modal -->
+    <div class="modal" [class.show]="isModalOpen">
+        <div class="modal-content">
+            <span class="close" (click)="closeModal()">&times;</span>
+            <h2>Assign Asset</h2>
+
+            <div class="form-group">
+                <label>User:</label>
+                <select [(ngModel)]="selectedUserId">
+                    <option value="">Select User</option>
+                    <option *ngFor="let user of users" [value]="user.id">
+                        {{user.name}} ({{user.department}})
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Asset:</label>
+                <select [(ngModel)]="selectedAssetId">
+                    <option value="">Select Asset</option>
+                    <option *ngFor="let asset of assets" [value]="asset.id">
+                        {{asset.asset_tag}} - {{asset.brand}} {{asset.model}} ({{asset.type}})
+                    </option>
+                </select>
+            </div>
+
+            <div class="actions">
+                <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+                <button class="assign-btn" (click)="assignAsset()">Assign Asset</button>
+            </div>
+        </div>
+    </div>
+
+
+    <h3>Assigned Assets</h3>
+    <table class="assign-table">
+        <thead>
+            <tr>
+                <th>Asset Tag</th>
+                <th>Type</th>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>User</th>
+                <th>Department</th>
+                <th>Assigned Date</th>
+                <th>Returned Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let a of assignedAssets">
+                <td>{{a.asset_tag}}</td>
+                <td>{{a.type}}</td>
+                <td>{{a.brand}}</td>
+                <td>{{a.model}}</td>
+                <td>{{a.user_name}}</td>
+                <td>{{a.department}}</td>
+                <td>{{ a.assigned_date | date:'dd-MM-yyyy' }}</td>
+                <td>{{ a.return_date | date:'dd-MM-yyyy' }}</td>
+                <td>{{a.status}}</td>
+                <td>
+                    <button *ngIf="a.status !== 'returned'" (click)="returnAsset(a.id)">Return</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

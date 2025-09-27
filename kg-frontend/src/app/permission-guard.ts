@@ -27,7 +27,8 @@ export class PermissionGuard implements CanActivate {
         'settings': 'view_settings',
         'all-users': 'view_all_users',
         'Settlement-report-table': 'view_Settlement_report_table',
-        'add-new-asset': 'view_add_new_asset'
+        'add-new-asset': 'view_add_new_asset',
+        'asset-assign-to-employee': 'view_asset_assign_to_employee'
       };
       requiredPermission = permissionMap[routePath];
     }

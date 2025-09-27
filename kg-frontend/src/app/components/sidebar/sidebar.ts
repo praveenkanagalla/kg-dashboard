@@ -26,7 +26,8 @@ export class Sidebar implements OnInit {
     { name: 'Settings', route: 'view_settings' },
     { name: 'Settlement-report-table', route: 'view_Settlement_report_table' },
     { name: 'all-users', route: 'view_all_users' },
-    { name: 'add-new-asset', route: 'view_add_new_asset' }
+    { name: 'add-new-asset', route: 'view_add_new_asset' },
+    { name: 'asset-assign-to-employee', route: 'view_asset_assign_to_employee' }
   ];
 
   constructor(private http: HttpClient, public auth: AuthService, private router: Router) { }
@@ -102,11 +103,20 @@ export class Sidebar implements OnInit {
     return ['/', this.auth.getRoleDashboard(), 'add-new-asset'];
   }
 
+  getAssetAssignToEmployeeLink(): string[] {
+    return ['/', this.auth.getRoleDashboard(), 'asset-assign-to-employee'];
+  }
+
   // dropdown code
   isStoreDropdownOpen = false;
+  isAssetAndAssignDropdownOpen = false;
 
   toggleStoreDropdown() {
     this.isStoreDropdownOpen = !this.isStoreDropdownOpen;
+  }
+
+  toggleAssetAndAssignDropdown() {
+    this.isAssetAndAssignDropdownOpen = !this.isAssetAndAssignDropdownOpen;
   }
 
   // Detect clicks outside dropdown

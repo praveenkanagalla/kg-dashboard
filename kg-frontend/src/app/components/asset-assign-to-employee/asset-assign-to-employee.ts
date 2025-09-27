@@ -29,16 +29,17 @@ interface AssignedAsset {
   user_name: string;
   department: string;
   assigned_date: string;
+  return_date: string;
   status: string;
 }
 
 @Component({
-  selector: 'app-assign-asset',
+  selector: 'app-asset-assign-to-employee',
   imports: [FormsModule, CommonModule, RouterModule],
-  templateUrl: './assign-asset.html',
-  styleUrl: './assign-asset.css'
+  templateUrl: './asset-assign-to-employee.html',
+  styleUrl: './asset-assign-to-employee.css'
 })
-export class AssignAsset implements OnInit {
+export class AssetAssignToEmployee implements OnInit {
 
   users: User[] = [];
   assets: Asset[] = [];
@@ -46,6 +47,15 @@ export class AssignAsset implements OnInit {
 
   selectedUserId!: number;
   selectedAssetId!: number;
+  isModalOpen: boolean = false;
+
+  openModal() {
+    this.isModalOpen = true;
+  }
+
+  closeModal() {
+    this.isModalOpen = false;
+  }
 
   constructor(private http: HttpClient, public auth: AuthService, private router: Router) { }
 
@@ -117,10 +127,4 @@ export class AssignAsset implements OnInit {
       }
     });
   }
-
-  BackToAssetPage() {
-    console.log("Hello")
-    this.router.navigate(['/', this.auth.getRoleDashboard(), 'add-new-asset']);
-  }
-
 }

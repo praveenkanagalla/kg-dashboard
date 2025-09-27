@@ -25,12 +25,32 @@ export class AddAsset implements OnInit {
   };
 
   assets: any[] = [];
+
+  // 🔍 Search term for filtering
+  searchTerm: string = '';
+
   isEditing: boolean = false;
+  showModal: boolean = false;
 
   constructor(private assetService: AssetService, public auth: AuthService, private router: Router) { }
 
   ngOnInit(): void {
     this.loadAssets();
+  }
+
+  // ✅ Filtering logic
+  filteredAssets() {
+    if (!this.searchTerm) return this.assets;
+
+    const term = this.searchTerm.toLowerCase();
+    return this.assets.filter(a =>
+      (a.asset_tag && a.asset_tag.toLowerCase().includes(term)) ||
+      (a.type && a.type.toLowerCase().includes(term)) ||
+      (a.brand && a.brand.toLowerCase().includes(term)) ||
+      (a.model && a.model.toLowerCase().includes(term)) ||
+      (a.serial_number && a.serial_number.toLowerCase().includes(term)) ||
+      (a.status && a.status.toLowerCase().includes(term))
+    );
   }
 
   saveAsset() {
@@ -104,5 +124,14 @@ export class AddAsset implements OnInit {
 
   OpneAssignAsset() {
     this.router.navigate(['/', this.auth.getRoleDashboard(), 'assign-asset']);
+  }
+
+  openModal() {
+    this.showModal = true;
+  }
+
+  closeModal() {
+    this.showModal = false;
+    this.resetForm();
   }
 }

@@ -3,7 +3,8 @@
     margin: 0 auto;
 }
 
-.opne-assign-asset button {
+.open-assign-asset-btn {
+    font-size: 20px;
     background-color: #ac4410;
     color: #fff;
     padding: 8px 16px;
@@ -15,54 +16,13 @@
     transition: background-color 0.3s, transform 0.2s;
 }
 
-.opne-assign-asset button:hover {
+.open-assign-asset-btn:hover {
     background-color: #762e0a;
     transform: translateY(-2px);
 }
 
-.asset-form {
-    max-width: 1000px;
-    margin: 20px auto;
-    padding: 20px;
-    border-radius: 12px;
-    background: #ffffff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.asset-form h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #2c3e50;
-    font-size: 22px;
-    font-weight: 600;
-}
-
-/* Form Layout - 3 inputs per row */
-.asset-form form {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-}
-
-/* Inputs & Select */
-.asset-form input,
-.asset-form select {
-    padding: 10px 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    outline: none;
-    font-size: 14px;
-    transition: border-color 0.2s;
-}
-
-.asset-form input:focus,
-.asset-form select:focus {
-    border-color: #3498db;
-    box-shadow: 0 0 4px rgba(52, 152, 219, 0.4);
-}
-
 .asset-form button {
-    padding: 12px;
+    padding: 7px 12px;
     border: none;
     border-radius: 8px;
     background: #ac4410;
@@ -77,7 +37,6 @@
 }
 
 .asset-list {
-    max-width: 1000px;
     margin: 30px auto;
     padding: 20px;
     border-radius: 12px;
@@ -88,8 +47,8 @@
 .asset-list h2 {
     text-align: center;
     margin-bottom: 20px;
-    color: #2c3e50;
-    font-size: 22px;
+    color: #762e0a;
+    font-size: 30px;
     font-weight: 600;
 }
 
@@ -133,33 +92,122 @@
     transition: background 0.2s ease-in-out;
 }
 
-/* Action buttons container */
-.asset-list td button {
-    margin-right: 6px;
-    padding: 6px 12px;
-    border: none;
+.add-asset-btn {
+    margin-bottom: 15px;
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.modal {
+    background: #fff;
+    width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.modal-body {
+    padding: 15px;
+}
+
+.asset-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* two columns */
+    gap: 15px;
+    /* spacing between inputs */
+}
+
+.asset-form input,
+.asset-form select {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
     border-radius: 6px;
-    font-size: 13px;
+    font-size: 14px;
+}
+
+.modal-actions {
+    grid-column: span 2;
+    /* buttons take full width row */
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
     cursor: pointer;
-    transition: all 0.3s ease;
 }
 
-/* Edit button */
-.asset-list .btn-edit {
-    background: #27ae60;
-    color: #fff;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
-.asset-list .btn-edit:hover {
-    background: #1e8449;
+.btn-edit,
+.btn-delete,
+.btn-status {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin: 0 4px;
+    font-size: 16px;
 }
 
-/* Delete button */
-.asset-list .btn-delete {
-    background: #e74c3c;
-    color: #fff;
+.btn-edit i {
+    color: #4caf50;
 }
 
-.asset-list .btn-delete:hover {
-    background: #c0392b;
+/* green pencil */
+.btn-delete i {
+    color: #f44336;
+}
+
+/* red trash */
+.btn-status i {
+    color: #2196f3;
+}
+
+.asset-list-search-box {
+    width: 300px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    padding: 7px 15px;
+    border-radius: 8px;
 }
