@@ -1,5 +1,6 @@
 <div class="users-container">
-    <h2>All Users</h2>
+    <button class="add-new-employee-btn" (click)="openAddNewEmployee()">Add New Employee</button>
+    <h2>All Employees History Table</h2>
 
     <!-- Search bar -->
     <input type="text" placeholder="Search by name, email or role..." [(ngModel)]="searchTerm" (input)="filterUsers()"
@@ -28,7 +29,7 @@
                     <td>{{ user.email || 'N/A' }}</td>
                     <td>{{ user.role || 'N/A' }}</td>
                     <td>{{ user.phone || 'N/A' }}</td>
-                    <td>{{ user.permissions?.join(', ') || 'No permissions' }}</td>
+                    <td>{{ user.permissions || 'N/A' }}</td>
                     <td>
                         <button class="view-btn" (click)="openModalView(user)">View</button>
                         <button class="edit-btn" (click)="openModalEdit(user)">Edit</button>
@@ -51,7 +52,7 @@
             <p><strong>Email:</strong> {{ selectedUser?.email || 'N/A' }}</p>
             <p><strong>Role:</strong> {{ selectedUser?.role || 'N/A' }}</p>
             <p><strong>Phone:</strong> {{ selectedUser?.phone || 'N/A' }}</p>
-            <p><strong>Permissions:</strong> {{ selectedUser?.permissions?.join(', ') || 'No permissions' }}</p>
+            <p><strong>Access Permissions:</strong> {{ selectedUser?.permissions || 'N/A' }}</p>
             <button (click)="closeModalView()">Close</button>
         </div>
     </div>
@@ -70,16 +71,28 @@
 
                 <label>Role:</label>
                 <select [(ngModel)]="editUserData.role" name="role">
-                    <option value="admin">Admin</option>
-                    <option value="manager">Manager</option>
-                    <option value="employee">Employee</option>
+                    <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
                 </select>
 
                 <label>Phone:</label>
                 <input [(ngModel)]="editUserData.phone" name="phone" />
 
-                <label>Permissions (comma separated):</label>
-                <input [(ngModel)]="permissionsInput" name="permissions" />
+                <label>Access Permissions</label>
+                <div class="dropdown-checkbox">
+                    <div class="dropdown-header" (click)="toggleDropdown()">
+                        {{ selectedPermissionsLabel() }}
+                        <span class="arrow">&#9662;</span>
+                    </div>
+
+                    <div class="dropdown-list" *ngIf="dropdownOpen">
+                        <label *ngFor="let perm of allPermissions">
+                            <input type="checkbox" [value]="perm.route"
+                                [checked]="userForm.get('permissions')?.value.includes(perm.route)"
+                                (change)="onAccessChange($event)" />
+                            {{ perm.name }}
+                        </label>
+                    </div>
+                </div>
 
                 <div class="modal-actions">
                     <button type="submit">Update</button>
@@ -88,4 +101,5 @@
             </form>
         </div>
     </div>
+
 </div>

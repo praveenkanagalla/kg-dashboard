@@ -2,16 +2,21 @@
     padding: 20px;
 }
 
+.users-container h2 {
+    font-size: 32px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
 .search-box {
-    width: 30%;
-    padding: 8px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+    width: 300px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    padding: 7px 15px;
+    border-radius: 8px;
 }
 
 .users-table {
-    width: 100%;
     border-collapse: collapse;
     background: #fff;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
@@ -139,7 +144,6 @@ button {
     font-size: 14px;
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
-    width: 100%;
 }
 
 .edit-form input:focus,
@@ -198,4 +202,83 @@ button {
         opacity: 1;
         transform: scale(1);
     }
+}
+
+.add-new-employee-btn {
+    font-size: 20px;
+    background-color: #ac4410;
+    color: #fff;
+    padding: 8px 16px;
+    margin-top: 10px;
+    margin-bottom: 30px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.add-new-employee-btn:hover {
+    background-color: #762e0a;
+    transform: translateY(-2px);
+}
+
+/* Dropdown checkbox styles */
+.dropdown-checkbox {
+    position: relative;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.dropdown-header {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color 0.3s;
+}
+
+.dropdown-header:hover {
+    border-color: #682f12;
+}
+
+.dropdown-header .arrow {
+    font-size: 0.9rem;
+    margin-left: 10px;
+    color: #682f12;
+    ;
+}
+
+.dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-list label {
+    display: inline-flex;
+    margin-right: 20px;
+    margin-bottom: 0.5rem;
+    color: #682f12;
+    ;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.dropdown-list input[type="checkbox"] {
+    margin-right: 0.2rem;
 }

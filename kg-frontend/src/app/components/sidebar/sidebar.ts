@@ -22,10 +22,9 @@ export class Sidebar implements OnInit {
   roleDashboard: string = '';
 
   allPermissions = [
-    { name: 'Create New Employee', route: 'view_new_employee' },
     { name: 'Settings', route: 'view_settings' },
     { name: 'Settlement-report-table', route: 'view_Settlement_report_table' },
-    { name: 'all-users', route: 'view_all_users' },
+    { name: 'all-employees', route: 'view_all_employees' },
     { name: 'add-new-asset', route: 'view_add_new_asset' },
     { name: 'asset-assign-to-employee', route: 'view_asset_assign_to_employee' }
   ];
@@ -83,16 +82,12 @@ export class Sidebar implements OnInit {
     return allowed;
   }
 
-  getNEwEmployeeLink(): string[] {
-    return ['/', this.auth.getRoleDashboard(), 'new-employee'];
-  }
-
   getSettingsLink(): string[] {
     return ['/', this.auth.getRoleDashboard(), 'settings'];
   }
 
   getAllUsersLink(): string[] {
-    return ['/', this.auth.getRoleDashboard(), 'all-users'];
+    return ['/', this.auth.getRoleDashboard(), 'all-employees'];
   }
 
   getSettlementReportTableLink(): string[] {

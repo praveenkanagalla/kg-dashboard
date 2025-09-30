@@ -45,17 +45,11 @@ export class AssetAssignToEmployee implements OnInit {
   assets: Asset[] = [];
   assignedAssets: AssignedAsset[] = [];
 
+  searchText: string = '';
+
   selectedUserId!: number;
   selectedAssetId!: number;
   isModalOpen: boolean = false;
-
-  openModal() {
-    this.isModalOpen = true;
-  }
-
-  closeModal() {
-    this.isModalOpen = false;
-  }
 
   constructor(private http: HttpClient, public auth: AuthService, private router: Router) { }
 
@@ -63,6 +57,14 @@ export class AssetAssignToEmployee implements OnInit {
     this.loadUsers();
     this.loadAssets();
     this.loadAssignedAssets();
+  }
+
+  openModal() {
+    this.isModalOpen = true;
+  }
+
+  closeModal() {
+    this.isModalOpen = false;
   }
 
   loadUsers() {
@@ -106,6 +108,7 @@ export class AssetAssignToEmployee implements OnInit {
         this.loadAssignedAssets();
         this.selectedUserId = 0;
         this.selectedAssetId = 0;
+        this.closeModal();
       },
       error: (err) => {
         console.error(err);
@@ -126,5 +129,20 @@ export class AssetAssignToEmployee implements OnInit {
         alert(err.error?.error || 'Failed to return asset');
       }
     });
+  }
+
+  // ✅ Filtering logic
+  filteredAssignedAssets(): AssignedAsset[] {
+    if (!this.searchText) return this.assignedAssets;
+
+    const term = this.searchText.toLowerCase();
+    return this.assignedAssets.filter(a =>
+      (a.asset_tag && a.asset_tag.toLowerCase().includes(term)) ||
+      (a.brand && a.brand.toLowerCase().includes(term)) ||
+      (a.model && a.model.toLowerCase().includes(term)) ||
+      (a.user_name && a.user_name.toLowerCase().includes(term)) ||
+      (a.department && a.department.toLowerCase().includes(term)) ||
+      (a.status && a.status.toLowerCase().includes(term))
+    );
   }
 }

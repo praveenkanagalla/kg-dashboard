@@ -20,6 +20,7 @@
                 <button class="logout-btn" (click)="logout()">Logout</button>
                 <app-modal [isOpen]="showModal" (close)="closeModal()">
                     <app-user-details></app-user-details>
+                    <button class="reset-password-btn" (click)="openResetPassword()">Reset Password</button>
                 </app-modal>
             </div>
         </header>

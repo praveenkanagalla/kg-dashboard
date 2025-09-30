@@ -28,11 +28,19 @@
                 <input [(ngModel)]="asset.model" name="model" placeholder="Model" required />
                 <input [(ngModel)]="asset.serial_number" name="serial_number" placeholder="Serial Number" required />
 
+                <!-- ✅ Status Dropdown -->
+                <select [(ngModel)]="asset.status" name="status" required>
+                    <option value="" disabled>Select Status</option>
+                    <option value="Available">Available</option>
+                    <option value="In-Repair">In-Repair</option>
+                </select>
+
                 <div class="modal-actions">
                     <button type="submit">{{ isEditing ? 'Update' : 'Save' }}</button>
                     <button type="button" (click)="closeModal()">Cancel</button>
                 </div>
             </form>
+
         </div>
     </div>
 </div>
@@ -64,7 +72,7 @@
                 <td>{{ a.brand }}</td>
                 <td>{{ a.model }}</td>
                 <td>{{ a.serial_number }}</td>
-                <td>{{ a.status }}</td>
+                <td>{{a.status}}</td>
                 <td>
                     <button class="btn-edit" (click)="editAsset(a); openModal()">
                         <i class="fas fa-pencil-alt"></i>

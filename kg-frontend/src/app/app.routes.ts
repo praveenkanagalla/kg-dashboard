@@ -6,25 +6,23 @@ import { Dashboard } from './pages/dashboard/dashboard';
 import { PermissionGuard } from './permission-guard';
 import { Settings } from './components/settings/settings';
 import { NewEmployee } from './components/new-employee/new-employee';
-import { AllUsers } from './components/all-users/all-users';
 import { ChilkooruReport } from './components/chilkooru-report/chilkooru-report';
 import { SettlementReportTable } from './components/settlement-report-table/settlement-report-table';
 import { AddAsset } from './components/add-asset/add-asset';
 import { AssetAssignToEmployee } from './components/asset-assign-to-employee/asset-assign-to-employee';
+import { AllEmployees } from './components/all-employees/all-employees';
 
 export const routes: Routes = [
     { path: 'login', component: Login },
     { path: 'forgot-password', component: ForgotPassword },
-    { path: 'reset-password', component: ResetPassword },
     {
         path: ':role-dashboard',
         component: Dashboard,
         children: [
             {
-                path: 'new-employee',
+                path: 'add-new-employee',
                 component: NewEmployee,
-                canActivate: [PermissionGuard],
-                data: { permission: 'view_new_employee' }
+                canActivate: [PermissionGuard]
             },
             {
                 path: 'Settlement-report-table',
@@ -39,8 +37,10 @@ export const routes: Routes = [
                 data: { permission: 'view_chilkooru_report' }
             },
             {
-                path: 'all-users',
-                component: AllUsers,
+                path: 'all-employees',
+                component: AllEmployees,
+                canActivate: [PermissionGuard],
+                data: { permission: 'view_all_employees' }
             },
             {
                 path: 'settings',
@@ -59,6 +59,11 @@ export const routes: Routes = [
                 component: AssetAssignToEmployee,
                 canActivate: [PermissionGuard],
                 data: { permission: 'view_asset_assign_to_employee' }
+            },
+            {
+                path: 'reset-password',
+                component: ResetPassword,
+                canActivate: [PermissionGuard],
             }
 
         ]

@@ -206,3 +206,38 @@
         transform: scale(1);
     }
 }
+
+/* Action buttons inside table */
+.assign-table button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    margin: 2px;
+}
+
+/* Return button */
+.assign-table button:nth-child(1) {
+    background-color: #4caf50;
+    color: white;
+}
+
+.assign-table button:nth-child(1):hover {
+    background-color: #45a049;
+}
+
+/* Repair button */
+.assign-table button:nth-child(2) {
+    background-color: #ff9800;
+    color: white;
+}
+
+.search-input {
+    width: 300px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    padding: 7px 15px;
+    border-radius: 8px;
+}

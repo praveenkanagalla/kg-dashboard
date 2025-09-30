@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [RouterModule, FormsModule, CommonModule],
   templateUrl: './forgot-password.html',
-  styleUrl: './forgot-password.css'
+  styleUrls: ['./forgot-password.css']
 })
 export class ForgotPassword {
   email: string = '';
@@ -26,7 +26,6 @@ export class ForgotPassword {
       return;
     }
 
-    // Call backend service
     this.auth.forgotPassword(this.email).subscribe({
       next: (res: any) => {
         this.message = res.message || 'Check your email for the reset link.';

@@ -8,6 +8,7 @@ interface User {
   email?: string;
   role?: string;
   phone?: string;
+  permissions?: string[];
 }
 
 @Component({
@@ -19,28 +20,29 @@ interface User {
 })
 export class UserDetails implements OnInit {
 
-  currentUser: User | null = null;       // Current logged-in user
+  currentUser: User | null = null;
   loadingUser = false;
   errorUser: string | null = null;
 
   constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-      const userId = user.userId || user.id;
-
-      if (userId) {
-        this.fetchUserWithPermissions(userId, user.role);
+    try {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        const userId = user.userId || user.id;
+        if (userId) {
+          this.fetchUserWithPermissions(userId, user.role);
+        }
       }
+    } catch (err) {
+      console.error('Error reading user from storage', err);
     }
   }
 
-  // Fetch current user and optionally all permissions if admin
   fetchUserWithPermissions(userId: number, role?: string): void {
     this.loadingUser = true;
-
     this.http.get<User>(`http://localhost:5000/api/users/${userId}`)
       .subscribe({
         next: (res) => {

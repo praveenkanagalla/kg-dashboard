@@ -13,21 +13,30 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./login.css']
 })
 export class Login {
-  email = '';
-  password = '';
-  error = '';
+  email: string = '';
+  password: string = '';
+  error: string = '';
 
-  constructor(private auth: AuthService, private router: Router) { }
+  constructor(private authService: AuthService, private router: Router) { }
 
   login() {
-    this.auth.login({ email: this.email, password: this.password }).subscribe({
+    this.error = '';
+
+    this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: (res: any) => {
-        this.auth.saveUserData(res);
-        // Redirect based on role
-        this.router.navigate([`/${res.role}-dashboard`]);
+        if (res.success) {
+          this.authService.saveUserData(res);
+          localStorage.setItem('token', res.token);
+          localStorage.setItem('email', res.email);
+          localStorage.setItem('role', res.role);
+          // ✅ Redirect based on role
+          this.router.navigate([this.authService.getRoleDashboard()]);
+        } else {
+          this.error = res.message || 'Login failed. Please try again.';
+        }
       },
       error: (err) => {
-        this.error = err.error?.message || 'Login failed';
+        this.error = err.error?.message || 'Invalid email or password';
       }
     });
   }

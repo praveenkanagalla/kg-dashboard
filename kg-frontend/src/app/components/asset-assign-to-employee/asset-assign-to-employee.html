@@ -6,7 +6,7 @@
     <div class="modal" [class.show]="isModalOpen">
         <div class="modal-content">
             <span class="close" (click)="closeModal()">&times;</span>
-            <h2>Assign Asset</h2>
+            <h2>Assign Asset to Employee</h2>
 
             <div class="form-group">
                 <label>User:</label>
@@ -35,8 +35,11 @@
         </div>
     </div>
 
+    <h3>Assigned Assets History Table</h3>
 
-    <h3>Assigned Assets</h3>
+    <!-- ✅ Search input -->
+    <input type="text" [(ngModel)]="searchText" placeholder="Search to Here..." class="search-input" />
+
     <table class="assign-table">
         <thead>
             <tr>
@@ -53,7 +56,8 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let a of assignedAssets">
+            <!-- ✅ Fixed function call -->
+            <tr *ngFor="let a of filteredAssignedAssets()">
                 <td>{{a.asset_tag}}</td>
                 <td>{{a.type}}</td>
                 <td>{{a.brand}}</td>
@@ -64,7 +68,8 @@
                 <td>{{ a.return_date | date:'dd-MM-yyyy' }}</td>
                 <td>{{a.status}}</td>
                 <td>
-                    <button *ngIf="a.status !== 'returned'" (click)="returnAsset(a.id)">Return</button>
+                    <button *ngIf="a.status !== 'returned'" (click)="returnAsset(a.id)"> <i
+                            class="fas fa-undo"></i></button>
                 </td>
             </tr>
         </tbody>

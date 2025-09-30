@@ -21,7 +21,7 @@ export class AddAsset implements OnInit {
     brand: '',
     model: '',
     serial_number: '',
-    status: 'Available'
+    status: 'Available'  // ✅ default value
   };
 
   assets: any[] = [];
@@ -92,7 +92,7 @@ export class AddAsset implements OnInit {
       brand: '',
       model: '',
       serial_number: '',
-      status: 'Available'
+      status: 'Available'  // ✅ default value
     };
     this.isEditing = false;
   }
@@ -120,10 +120,6 @@ export class AddAsset implements OnInit {
         console.error('Error fetching assets', err);
       }
     });
-  }
-
-  OpneAssignAsset() {
-    this.router.navigate(['/', this.auth.getRoleDashboard(), 'assign-asset']);
   }
 
   openModal() {

@@ -1,14 +1,6 @@
 <div class="sidebar">
     <ul class="sidebar-content">
         <li>
-            <a class="sidebar-nav" *ngIf="auth.hasPermission('view_create_new_user')"
-                [routerLink]="getNEwEmployeeLink()" routerLinkActive="active-link"
-                [routerLinkActiveOptions]="{ exact: true }">
-                Create New Employee
-            </a>
-        </li>
-
-        <li>
             <a class="sidebar-nav" *ngIf="auth.hasPermission('view_settings')" [routerLink]="getSettingsLink()"
                 routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
                 Settings
@@ -19,7 +11,7 @@
             <a class="sidebar-nav  all-users-btn" *ngIf="auth.hasPermission('view_all_users')"
                 [routerLink]="getAllUsersLink()" routerLinkActive="active-link"
                 [routerLinkActiveOptions]="{ exact: true }">
-                All Users
+                All Employees
             </a>
         </li>
 
@@ -51,7 +43,7 @@
         </li>
 
         <!-- Dropdown for Asset and Assign -->
-        <li class="dropdown" *ngIf="role === 'Admin'">
+        <li class="dropdown">
             <a class="sidebar-nav" (click)="toggleAssetAndAssignDropdown()">
                 Asset and Assign
                 <span class="arrow" [class.open]="isAssetAndAssignDropdownOpen">&#9662;</span>
@@ -61,14 +53,14 @@
                     <a class="sidebar-subnav" *ngIf="auth.hasPermission('view_add_new_asset')"
                         [routerLink]=" getAddNewAssetLink()" routerLinkActive="active-link"
                         [routerLinkActiveOptions]="{ exact: true }">
-                        Add New Asset
+                        Assets
                     </a>
                 </li>
                 <li>
                     <a class="sidebar-subnav" *ngIf="auth.hasPermission('view_asset_assign_to_employee')"
                         [routerLink]=" getAssetAssignToEmployeeLink()" routerLinkActive="active-link"
                         [routerLinkActiveOptions]="{ exact: true }">
-                        Asset Assign to Employee
+                        Assigned Assets
                     </a>
                 </li>
             </ul>

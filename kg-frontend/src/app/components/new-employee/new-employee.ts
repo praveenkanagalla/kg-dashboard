@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { AuthService } from '../../service/auth';
 
 @Component({
   selector: 'app-new-employee',
@@ -24,7 +26,6 @@ export class NewEmployee implements OnInit {
   roles = ['Owner', 'User', 'ManagerCLK', 'ManagerLB', 'ManagerKP', 'Admin'];
 
   allPermissions = [
-    { name: 'Create New Employee', route: 'view_new_employee' },
     { name: 'Settings', route: 'view_settings' },
     { name: 'Settlement-report-table', route: 'view_Settlement_report_table' },
     { name: 'all-users', route: 'view_all_users' },
@@ -35,7 +36,7 @@ export class NewEmployee implements OnInit {
 
   permissionsList = [...this.allPermissions]; // filtered in ngOnInit
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {
+  constructor(private fb: FormBuilder, private http: HttpClient, public auth: AuthService, private router: Router) {
     this.userForm = this.fb.group({
       name: ['', Validators.required],
       phone: ['', Validators.required],
@@ -133,6 +134,10 @@ export class NewEmployee implements OnInit {
         alert('Error creating user: ' + (err.error?.error || 'Server error'));
       }
     });
+  }
+
+  openAllEmployee() {
+    this.router.navigate(['/', this.auth.getRoleDashboard(), 'all-employees']);
   }
 }
 

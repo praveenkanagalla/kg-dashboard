@@ -14,7 +14,8 @@ export class AuthService {
 
   // ===== API Calls =====
   register(data: any) {
-    return this.http.post(`${this.apiUrl}/register`, data);
+    // ✅ updated to match Flask route
+    return this.http.post(`${this.apiUrl}/users`, data);
   }
 
   login(credentials: { email: string; password: string }) {
@@ -75,7 +76,7 @@ export class AuthService {
 
   hasPermission(permission: string): boolean {
     const role = this.getRole().toLowerCase();
-    if (role === 'admin') return true; // Admin sees everything
+    if (role === 'admin') return true;
     return this.getPermissions().map(p => p.toLowerCase().trim())
       .includes(permission.toLowerCase().trim());
   }
@@ -88,7 +89,6 @@ export class AuthService {
     localStorage.clear();
   }
 
-  // ===== Optional: Decode JWT =====
   decodeToken(): any | null {
     const token = this.getToken();
     if (!token) return null;
@@ -99,7 +99,6 @@ export class AuthService {
     }
   }
 
-  // ===== Dashboard Routing by Role =====
   getRoleDashboard(): string {
     const role = this.getRole();
     return role ? `${role}-dashboard` : '';

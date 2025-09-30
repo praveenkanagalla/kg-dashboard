@@ -6,6 +6,7 @@ import { Sidebar } from '../../components/sidebar/sidebar';
 import { HttpClient } from '@angular/common/http';
 import { Modal } from '../../components/modal/modal';
 import { UserDetails } from '../../components/user-details/user-details';
+import { AuthService } from '../../service/auth';
 
 interface User {
   userId: number;   // matches backend
@@ -30,7 +31,7 @@ export class Dashboard implements OnInit {
   user: User | null = null;
   userId: number | null = null;
 
-  constructor(private route: ActivatedRoute, private router: Router, private http: HttpClient) { }
+  constructor(private route: ActivatedRoute, private router: Router, private http: HttpClient, public auth: AuthService) { }
 
 
   ngOnInit(): void {
@@ -70,5 +71,10 @@ export class Dashboard implements OnInit {
   logout(): void {
     localStorage.clear();
     window.location.href = '/';
+  }
+
+  openResetPassword() {
+    this.router.navigate(['/', this.auth.getRoleDashboard(), 'reset-password']);
+    this.showModal = false;
   }
 }
